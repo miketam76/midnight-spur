@@ -232,10 +232,11 @@ export function createAudioSystem() {
     // ... Keep rest of your sound effects methods (playDraw, playVictory, etc.) ...
 
     return {
-        // ... existing API ...
-        stopMusic,
+        unlock() {
+            ensureContext();
+        },
         startMusic() {
-            stopMusic(); // ALWAYS kill previous instance before starting new one
+            stopMusic(); // Always kill previous instance before starting new one
             const audioContext = ensureContext();
             if (!audioContext || muted || musicMuted) {
                 return;
@@ -245,6 +246,80 @@ export function createAudioSystem() {
             musicLoopEnd = 0;
             scheduleMusic();
             musicTimer = window.setInterval(scheduleMusic, 1000);
+        },
+        stopMusic() {
+            stopMusic();
+        },
+        setMuted(value) {
+            muted = Boolean(value);
+
+            if (!context) {
+                return muted;
+            }
+
+            if (muted && context.state === 'running') {
+                void context.suspend();
+            }
+
+            if (!muted && context.state === 'suspended') {
+                void context.resume();
+            }
+
+            if (muted) {
+                stopMusic();
+            } else if (musicEnabled) {
+                scheduleMusic();
+                clearMusicTimer();
+                musicTimer = window.setInterval(scheduleMusic, 1000);
+            }
+
+            return muted;
+        },
+        toggleMute() {
+            return this.setMuted(!muted);
+        },
+        isMuted() {
+            return muted;
+        },
+        playSignal() {
+            if (muted) return;
+            const audioContext = ensureContext();
+            if (!audioContext) return;
+            const now = audioContext.currentTime;
+            scheduleTone(audioContext, 392, now, 0.08, 'triangle', 0.05);
+            scheduleTone(audioContext, 523.25, now + 0.08, 0.09, 'triangle', 0.05);
+        },
+        playDraw() {
+            if (muted) return;
+            const audioContext = ensureContext();
+            if (!audioContext) return;
+            const now = audioContext.currentTime;
+            playPeacemakerShot(audioContext, now, 196);
+        },
+        playHit() {
+            if (muted) return;
+            const audioContext = ensureContext();
+            if (!audioContext) return;
+            const now = audioContext.currentTime;
+            playPeacemakerShot(audioContext, now, 170);
+            scheduleTone(audioContext, 82, now + 0.02, 0.09, 'square', 0.03, -22);
+        },
+        playVictory() {
+            if (muted) return;
+            const audioContext = ensureContext();
+            if (!audioContext) return;
+            const now = audioContext.currentTime;
+            scheduleTone(audioContext, 523.25, now, 0.08, 'triangle', 0.06);
+            scheduleTone(audioContext, 659.25, now + 0.1, 0.08, 'triangle', 0.06);
+            scheduleTone(audioContext, 783.99, now + 0.2, 0.12, 'triangle', 0.06);
+        },
+        playLoss() {
+            if (muted) return;
+            const audioContext = ensureContext();
+            if (!audioContext) return;
+            const now = audioContext.currentTime;
+            playPeacemakerShot(audioContext, now, 158);
+            scheduleTone(audioContext, 106, now + 0.025, 0.14, 'square', 0.035, -16);
         },
     };
 }
