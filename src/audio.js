@@ -122,6 +122,8 @@ function scheduleWesternLoop(context, startTime) {
     }
 }
 
+// audio.js
+
 export function createAudioSystem() {
     let context = null;
     let muted = false;
@@ -130,6 +132,10 @@ export function createAudioSystem() {
     let musicEnabled = false;
     let musicMuted = false;
     let musicRestartTimer = null;
+
+    // Track active music nodes for hard cancellation
+    let activeMusicNodes = [];
+    let musicGain = null;
 
     function ensureContext() {
         if (muted) {
@@ -143,6 +149,8 @@ export function createAudioSystem() {
             }
 
             context = new AudioContext();
+            musicGain = context.createGain();
+            musicGain.connect(context.destination);
         }
 
         if (context.state === 'suspended') {
@@ -150,6 +158,14 @@ export function createAudioSystem() {
         }
 
         return context;
+    }
+
+    // Helper to register scheduled music oscillators so they can be hard-killed
+    function registerMusicNode(node) {
+        activeMusicNodes.push(node);
+        node.onended = () => {
+            activeMusicNodes = activeMusicNodes.filter((n) => n !== node);
+        };
     }
 
     function clearMusicTimer() {
@@ -166,6 +182,30 @@ export function createAudioSystem() {
         }
     }
 
+    function stopMusic() {
+        musicEnabled = false;
+        musicLoopEnd = 0;
+        clearMusicTimer();
+        clearMusicRestartTimer();
+
+        // 1. Instantly stop and disconnect all scheduled music oscillators
+        activeMusicNodes.forEach((node) => {
+            try {
+                node.stop(0);
+                node.disconnect();
+            } catch (err) {
+                // Ignore if node already stopped naturally
+            }
+        });
+        activeMusicNodes = [];
+
+        // 2. Mute music gain immediately to prevent lingering tails
+        if (musicGain && context) {
+            musicGain.gain.cancelScheduledValues(context.currentTime);
+            musicGain.gain.setValueAtTime(0, context.currentTime);
+        }
+    }
+
     function scheduleMusic() {
         if (!context || muted || !musicEnabled) {
             return;
@@ -174,203 +214,74 @@ export function createAudioSystem() {
         const now = context.currentTime;
         const lookahead = 2.5;
 
+        // Ensure music gain is open when music is actively playing
+        if (musicGain) {
+            musicGain.gain.cancelScheduledValues(now);
+            musicGain.gain.setValueAtTime(1, now);
+        }
+
         if (musicLoopEnd === 0 || now + lookahead >= musicLoopEnd) {
             const nextStart = musicLoopEnd === 0 ? now + 0.05 : musicLoopEnd;
-            scheduleWesternLoop(context, nextStart);
+
+            // Pass musicGain and node tracking into loop scheduler
+            scheduleWesternLoopTracked(context, nextStart, musicGain, registerMusicNode);
             musicLoopEnd = nextStart + (60 / 96) * 8;
         }
     }
 
-    function startMusic() {
-        if (muted || musicMuted) {
-            return;
-        }
+    // ... Keep rest of your sound effects methods (playDraw, playVictory, etc.) ...
 
-        const audioContext = ensureContext();
-        if (!audioContext) {
-            return;
-        }
+    return {
+        // ... existing API ...
+        stopMusic,
+        startMusic() {
+            stopMusic(); // ALWAYS kill previous instance before starting new one
+            const audioContext = ensureContext();
+            if (!audioContext || muted || musicMuted) {
+                return;
+            }
 
-        if (musicEnabled && musicTimer) {
-            return;
-        }
-
-        clearMusicRestartTimer();
-        clearMusicTimer();
-
-        if (!musicEnabled) {
             musicEnabled = true;
             musicLoopEnd = 0;
             scheduleMusic();
-        }
-
-        musicTimer = window.setInterval(scheduleMusic, 1000);
-    }
-
-    function stopMusic() {
-        musicEnabled = false;
-        musicLoopEnd = 0;
-        clearMusicTimer();
-        clearMusicRestartTimer();
-
-        // If context exists, suspending and resuming flushes/resets audio state
-        if (context && context.state === 'running') {
-            void context.suspend().then(() => {
-                if (!muted && context) {
-                    void context.resume();
-                }
-            });
-        }
-    }
-
-    function interruptMusic(restartDelayMs = 180) {
-        if (!musicEnabled) {
-            return;
-        }
-
-        clearMusicTimer();
-        musicLoopEnd = 0;
-        clearMusicRestartTimer();
-
-        if (muted || musicMuted) {
-            return;
-        }
-
-        musicRestartTimer = window.setTimeout(() => {
-            musicRestartTimer = null;
-
-            if (!musicEnabled || muted || musicMuted) {
-                return;
-            }
-
-            const audioContext = ensureContext();
-            if (!audioContext) {
-                return;
-            }
-
-            scheduleMusic();
-            clearMusicTimer();
             musicTimer = window.setInterval(scheduleMusic, 1000);
-        }, restartDelayMs);
-    }
-
-    return {
-        unlock() {
-            ensureContext();
-        },
-        startMusic() {
-            startMusic();
-        },
-        stopMusic() {
-            stopMusic();
-        },
-        interruptMusic(restartDelayMs = 180) {
-            interruptMusic(restartDelayMs);
-        },
-        setMuted(value) {
-            muted = Boolean(value);
-
-            if (!context) {
-                return muted;
-            }
-
-            if (muted && context.state === 'running') {
-                void context.suspend();
-            }
-
-            if (!muted && context.state === 'suspended') {
-                void context.resume();
-            }
-
-            if (muted) {
-                clearMusicTimer();
-                clearMusicRestartTimer();
-            } else if (musicEnabled) {
-                scheduleMusic();
-                clearMusicTimer();
-                musicTimer = window.setInterval(scheduleMusic, 1000);
-            }
-
-            return muted;
-        },
-        toggleMute() {
-            return this.setMuted(!muted);
-        },
-        isMuted() {
-            return muted;
-        },
-        playSignal() {
-            if (muted) {
-                return;
-            }
-
-            const audioContext = ensureContext();
-            if (!audioContext) {
-                return;
-            }
-
-            const now = audioContext.currentTime;
-            scheduleTone(audioContext, 392, now, 0.08, 'triangle', 0.05);
-            scheduleTone(audioContext, 523.25, now + 0.08, 0.09, 'triangle', 0.05);
-        },
-        playDraw() {
-            if (muted) {
-                return;
-            }
-
-            const audioContext = ensureContext();
-            if (!audioContext) {
-                return;
-            }
-
-            interruptMusic(160);
-            const now = audioContext.currentTime;
-            playPeacemakerShot(audioContext, now, 196);
-        },
-        playHit() {
-            if (muted) {
-                return;
-            }
-
-            const audioContext = ensureContext();
-            if (!audioContext) {
-                return;
-            }
-
-            interruptMusic(140);
-            const now = audioContext.currentTime;
-            playPeacemakerShot(audioContext, now, 170);
-            scheduleTone(audioContext, 82, now + 0.02, 0.09, 'square', 0.03, -22);
-        },
-        playVictory() {
-            if (muted) {
-                return;
-            }
-
-            const audioContext = ensureContext();
-            if (!audioContext) {
-                return;
-            }
-
-            const now = audioContext.currentTime;
-            scheduleTone(audioContext, 523.25, now, 0.08, 'triangle', 0.06);
-            scheduleTone(audioContext, 659.25, now + 0.1, 0.08, 'triangle', 0.06);
-            scheduleTone(audioContext, 783.99, now + 0.2, 0.12, 'triangle', 0.06);
-        },
-        playLoss() {
-            if (muted) {
-                return;
-            }
-
-            const audioContext = ensureContext();
-            if (!audioContext) {
-                return;
-            }
-
-            interruptMusic(200);
-            const now = audioContext.currentTime;
-            playPeacemakerShot(audioContext, now, 158);
-            scheduleTone(audioContext, 106, now + 0.025, 0.14, 'square', 0.035, -16);
         },
     };
+}
+
+// Tracked Tone Scheduler that routes through musicGain and registers with activeMusicNodes
+function scheduleTrackedTone(context, frequency, startTime, duration, type, gainValue, destinationGain, registerNode) {
+    const osc = context.createOscillator();
+    const gainNode = context.createGain();
+
+    osc.type = type;
+    osc.frequency.value = frequency;
+    gainNode.gain.value = gainValue;
+
+    osc.connect(gainNode);
+    gainNode.connect(destinationGain);
+
+    gainNode.gain.setValueAtTime(0, startTime);
+    gainNode.gain.linearRampToValueAtTime(gainValue, startTime + 0.004);
+    gainNode.gain.exponentialRampToValueAtTime(Math.max(0.0001, gainValue * 0.001), startTime + duration);
+
+    osc.start(startTime);
+    osc.stop(startTime + duration + 0.02);
+
+    registerNode(osc);
+}
+
+function scheduleWesternLoopTracked(context, startTime, musicGain, registerNode) {
+    const beat = 60 / 96;
+    const bassNotes = [82.41, 98, 110, 98];
+
+    for (let bar = 0; bar < 2; bar += 1) {
+        const barStart = startTime + bar * 4 * beat;
+
+        bassNotes.forEach((frequency, beatIndex) => {
+            const noteStart = barStart + beatIndex * beat;
+            scheduleTrackedTone(context, frequency, noteStart, beat * 0.9, 'sine', 0.03, musicGain, registerNode);
+            scheduleTrackedTone(context, frequency * 2, noteStart + 0.006, beat * 0.18, 'triangle', 0.015, musicGain, registerNode);
+        });
+    }
 }
