@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#182138" />
+    <title>Midnight Spur</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Roboto+Condensed:wght@400;700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+    <main class="app-shell">
+        <section id="menuScreen" class="screen screen--menu is-active" aria-labelledby="menuTitle">
+            <div class="poster">
+                <p class="eyebrow">Dusk settles. Pistols rise.</p>
+                <h1 id="menuTitle">Midnight Spur</h1>
+                <p class="subcopy">One button. One shot. Outspeed the outlaw under the last light of day.</p>
+                <div class="menu-card">
+                    <button id="startButton" class="primary-button">Start Game</button>
+                    <button id="scoresButton" class="secondary-button" type="button">High Scores</button>
+                </div>
+                <div class="score-strip" aria-live="polite">
+                    <span>Best wins</span>
+                    <strong id="bestWins">0</strong>
+                </div>
+            </div>
+        </section>
+
+        <section id="gameScreen" class="screen screen--game" aria-labelledby="gameTitle" hidden>
+            <header class="hud">
+                <div>
+                    <p class="hud-label">Round</p>
+                    <strong id="roundValue">1</strong>
+                </div>
+                <div>
+                    <p class="hud-label">Wins</p>
+                    <strong id="winsValue">0</strong>
+                </div>
+                <div>
+                    <p class="hud-label">Best</p>
+                    <strong id="bestValue">0</strong>
+                </div>
+            </header>
+
+            <div class="arena-frame">
+                <div class="arena-glow"></div>
+                <div class="status-banner" aria-live="assertive">
+                    <p id="statusText">Wait for the signal.</p>
+                </div>
+                <canvas id="gameCanvas" width="960" height="540" aria-label="Wild west duel arena"></canvas>
+            </div>
+
+            <div class="controls">
+                <button id="drawButton" class="draw-button" type="button">DRAW</button>
+                <p class="hint">Tap once when the moment feels right. Fire early and you lose.</p>
+            </div>
+
+            <div class="utility-bar">
+                <button id="pauseButton" class="utility-button" type="button">Pause</button>
+                <button id="muteButton" class="utility-button" type="button">Mute</button>
+                <button id="exitButton" class="utility-button" type="button">Quit</button>
+            </div>
+        </section>
+
+        <section id="resultScreen" class="screen screen--result" aria-labelledby="resultTitle" hidden>
+            <div class="result-card">
+                <p id="resultBadge" class="eyebrow">Duel ended</p>
+                <h2 id="resultTitle">Game Over</h2>
+                <p id="resultMessage" class="subcopy">The outlaw got the first shot.</p>
+                <div class="result-stats">
+                    <div>
+                        <span>Wins</span>
+                        <strong id="finalWins">0</strong>
+                    </div>
+                    <div>
+                        <span>Best</span>
+                        <strong id="finalBest">0</strong>
+                    </div>
+                </div>
+                <button id="playAgainButton" class="primary-button" type="button">Play Again</button>
+                <button id="backToMenuButton" class="secondary-button" type="button">Main Menu</button>
+            </div>
+        </section>
+    </main>
+
+    <script type="module" src="src/main.js"></script>
+</body>
+
+</html>
