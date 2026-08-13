@@ -48,13 +48,27 @@ function scheduleNoiseBurst(context, startTime, duration, gainValue) {
     source.stop(startTime + duration + 0.02);
 }
 
-function playPeacemakerShot(context, startTime, baseFrequency = 165) {
-    scheduleTone(context, baseFrequency + 24, startTime, 0.028, 'square', 0.24, -10);
-    scheduleTone(context, baseFrequency * 2.1, startTime + 0.001, 0.014, 'triangle', 0.12, 30);
-    scheduleTone(context, baseFrequency * 0.36, startTime + 0.008, 0.072, 'sawtooth', 0.065, -16);
-    scheduleTone(context, 92, startTime + 0.012, 0.055, 'square', 0.05, -24);
-    scheduleTone(context, 58, startTime + 0.006, 0.06, 'triangle', 0.045, -12);
-    scheduleNoiseBurst(context, startTime + 0.0004, 0.02, 0.18);
+// Authentic 8-Bit Chiptune Gunshot
+function playPeacemakerShot(context, startTime, baseFrequency = 220) {
+    // 1. Rapid Pitch-Dive Square Wave (Pistol Crack)
+    const osc = context.createOscillator();
+    const gainNode = context.createGain();
+
+    osc.type = 'square'; // Classic NES pulse channel
+    osc.frequency.setValueAtTime(baseFrequency, startTime);
+    osc.frequency.exponentialRampToValueAtTime(40, startTime + 0.08); // Sharp pitch dive
+
+    gainNode.gain.setValueAtTime(0.18, startTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + 0.08);
+
+    osc.connect(gainNode);
+    gainNode.connect(context.destination);
+
+    osc.start(startTime);
+    osc.stop(startTime + 0.08);
+
+    // 2. Short Noise Burst (Powder Blast)
+    scheduleNoiseBurst(context, startTime, 0.06, 0.22);
 }
 
 function schedulePluck(context, frequency, startTime, duration, gainValue, type = 'triangle', detune = 0) {
@@ -346,17 +360,32 @@ function scheduleTrackedTone(context, frequency, startTime, duration, type, gain
     registerNode(osc);
 }
 
+// 8-Bit Spaghetti Western Loop (Pulse + Triangle channels)
 function scheduleWesternLoopTracked(context, startTime, musicGain, registerNode) {
-    const beat = 60 / 96;
-    const bassNotes = [82.41, 98, 110, 98];
+    const beat = 60 / 102; // Slightly snappier arcade tempo
+    const bassNotes = [82.41, 98.00, 110.00, 98.00]; // E2, G2, A2, G2
 
     for (let bar = 0; bar < 2; bar += 1) {
         const barStart = startTime + bar * 4 * beat;
 
+        // Triangle Channel: Staccato Chiptune Bass
         bassNotes.forEach((frequency, beatIndex) => {
             const noteStart = barStart + beatIndex * beat;
-            scheduleTrackedTone(context, frequency, noteStart, beat * 0.9, 'sine', 0.03, musicGain, registerNode);
-            scheduleTrackedTone(context, frequency * 2, noteStart + 0.006, beat * 0.18, 'triangle', 0.015, musicGain, registerNode);
+            scheduleTrackedTone(context, frequency, noteStart, beat * 0.4, 'triangle', 0.05, musicGain, registerNode);
+            scheduleTrackedTone(context, frequency, noteStart + beat * 0.5, beat * 0.3, 'triangle', 0.03, musicGain, registerNode);
         });
+
+        // Square Channel: 8-Bit Whistle Melody
+        const melody = bar === 0
+            ? [{ t: 0, f: 659.25 }, { t: 1.5, f: 783.99 }, { t: 2.5, f: 880.00 }] // E5, G5, A5
+            : [{ t: 0, f: 783.99 }, { t: 1.5, f: 659.25 }, { t: 2.5, f: 587.33 }]; // G5, E5, D5
+
+        melody.forEach((note) => {
+            const noteStart = barStart + note.t * beat;
+            scheduleTrackedTone(context, note.f, noteStart, beat * 0.9, 'square', 0.025, musicGain, registerNode);
+        });
+
+        // Baritone Guitar Twang (Square Pitch Bend)
+        scheduleTrackedTone(context, 146.83, barStart + beat * 3.5, beat * 0.45, 'square', 0.03, musicGain, registerNode);
     }
 }
