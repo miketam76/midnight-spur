@@ -16,6 +16,24 @@ function drawPixel(ctx, x, y, width, height, color) {
     ctx.fillRect(Math.floor(x), Math.floor(y), Math.floor(width), Math.floor(height));
 }
 
+// 8-Bit Wooden Frame Countdown Bar
+function drawTimerMeter(ctx, width, progress) {
+    const meterWidth = Math.round(width * 0.58);
+    const meterHeight = 16;
+    const meterX = Math.round((width - meterWidth) / 2);
+    const meterY = 18;
+    const fillWidth = Math.round(meterWidth * progress);
+
+    drawPixel(ctx, meterX - 6, meterY - 6, meterWidth + 12, meterHeight + 12, nesPalette.outline);
+    drawPixel(ctx, meterX - 4, meterY - 4, meterWidth + 8, meterHeight + 8, nesPalette.woodDark);
+    drawPixel(ctx, meterX, meterY, meterWidth, meterHeight, '#000000');
+
+    if (fillWidth > 0) {
+        drawPixel(ctx, meterX, meterY, fillWidth, meterHeight, '#fce0a0');
+        drawPixel(ctx, meterX, meterY, fillWidth, 4, '#ffffff');
+    }
+}
+
 // Draw Authentic Hogan's Alley Style Cowboy Sprite
 function drawHogansCowboy(ctx, x, y, outfit, facingLeft, drawArmUp) {
     const dir = facingLeft ? -1 : 1;
@@ -175,57 +193,101 @@ function drawHogansFallenCowboy(ctx, x, y, outfit, facingLeft, progress) {
     ctx.restore();
 }
 
-// Hogan's Alley Range Scene Background
+// Wild West Town Background (Rescaled Architecture)
 function renderHogansBackground(ctx, width, height, tension, progress) {
-    const skySplit = Math.floor(height * 0.50);
+    const skySplit = Math.floor(height * 0.52);
 
     // Stark 8-Bit Sky Banding
-    drawPixel(ctx, 0, 0, width, skySplit * 0.4, nesPalette.skyTop);
-    drawPixel(ctx, 0, skySplit * 0.4, width, skySplit * 0.3, nesPalette.skyMid);
-    drawPixel(ctx, 0, skySplit * 0.7, width, skySplit * 0.3, nesPalette.skyBottom);
+    drawPixel(ctx, 0, 0, width, skySplit * 0.35, nesPalette.skyTop);
+    drawPixel(ctx, 0, skySplit * 0.35, width, skySplit * 0.3, nesPalette.skyMid);
+    drawPixel(ctx, 0, skySplit * 0.65, width, skySplit * 0.35, nesPalette.skyBottom);
 
-    // Hogan's Alley Brick Cutout Buildings & Wooden Range Scenery
-    const fenceY = skySplit - 40;
+    const groundY = skySplit - 8;
 
-    // Left Brick Saloon Cutout
-    drawPixel(ctx, 20, fenceY - 20, 140, 60, nesPalette.outline);
-    drawPixel(ctx, 24, fenceY - 16, 132, 52, '#882800'); // Red Brick
-    drawPixel(ctx, 40, fenceY - 8, 30, 24, nesPalette.outline); // Window
-    drawPixel(ctx, 90, fenceY - 8, 30, 24, nesPalette.outline);
+    // --- 1. TWO-STORY SALOON (Left Building) ---
+    const saloonX = 10;
+    const saloonW = 190;
+    const saloonH = 140;
+    const saloonY = groundY - saloonH + 10;
 
-    // Right Wooden Storefront Cutout
-    drawPixel(ctx, width - 180, fenceY - 30, 150, 70, nesPalette.outline);
-    drawPixel(ctx, width - 176, fenceY - 26, 142, 62, nesPalette.woodLight);
-    drawPixel(ctx, width - 160, fenceY - 16, 110, 8, nesPalette.woodDark); // Signboard
+    // Main Brick Structure
+    drawPixel(ctx, saloonX, saloonY, saloonW, saloonH, nesPalette.outline);
+    drawPixel(ctx, saloonX + 4, saloonY + 4, saloonW - 8, saloonH - 8, '#882800');
 
-    // Wooden Range Stand Planks
-    drawPixel(ctx, 0, fenceY + 20, width, 20, nesPalette.outline);
-    drawPixel(ctx, 0, fenceY + 22, width, 16, nesPalette.woodDark);
+    // Ornamental Roof Parapet
+    drawPixel(ctx, saloonX + 20, saloonY - 16, saloonW - 40, 16, nesPalette.outline);
+    drawPixel(ctx, saloonX + 24, saloonY - 12, saloonW - 48, 12, nesPalette.woodDark);
 
-    // Ground Shooting Range Dirt
-    drawPixel(ctx, 0, skySplit, width, height - skySplit, nesPalette.ground);
-    drawPixel(ctx, 0, skySplit + 42, width, 14, nesPalette.groundDark);
+    // Saloon Main Signboard
+    drawPixel(ctx, saloonX + 25, saloonY + 12, 140, 20, nesPalette.outline);
+    drawPixel(ctx, saloonX + 28, saloonY + 14, 134, 16, nesPalette.woodLight);
 
-    // Target Track Groove Line on Floor
-    drawPixel(ctx, width * 0.15, skySplit + 20, width * 0.7, 4, nesPalette.outline);
-}
+    // Upper Floor Windows
+    drawPixel(ctx, saloonX + 25, saloonY + 42, 32, 28, nesPalette.outline);
+    drawPixel(ctx, saloonX + 133, saloonY + 42, 32, 28, nesPalette.outline);
 
-// 8-Bit Wooden Frame Countdown Bar
-function drawTimerMeter(ctx, width, progress) {
-    const meterWidth = Math.round(width * 0.58);
-    const meterHeight = 16;
-    const meterX = Math.round((width - meterWidth) / 2);
-    const meterY = 18;
-    const fillWidth = Math.round(meterWidth * progress);
+    // Lower Floor Batwing Doors & Porch Pillars
+    drawPixel(ctx, saloonX + 75, saloonY + 84, 40, 48, nesPalette.outline);
+    drawPixel(ctx, saloonX + 78, saloonY + 92, 34, 30, nesPalette.woodDark);
+    drawPixel(ctx, saloonX + 10, saloonY + 80, 8, 52, nesPalette.outline);
+    drawPixel(ctx, saloonX + 172, saloonY + 80, 8, 52, nesPalette.outline);
 
-    drawPixel(ctx, meterX - 6, meterY - 6, meterWidth + 12, meterHeight + 12, nesPalette.outline);
-    drawPixel(ctx, meterX - 4, meterY - 4, meterWidth + 8, meterHeight + 8, nesPalette.woodDark);
-    drawPixel(ctx, meterX, meterY, meterWidth, meterHeight, '#000000');
+    // --- 2. HOTEL & SHERIFF OFFICE (Right Building) ---
+    const hotelX = width - 210;
+    const hotelW = 200;
+    const hotelH = 150;
+    const hotelY = groundY - hotelH + 10;
 
-    if (fillWidth > 0) {
-        drawPixel(ctx, meterX, meterY, fillWidth, meterHeight, '#fce0a0');
-        drawPixel(ctx, meterX, meterY, fillWidth, 4, '#ffffff');
-    }
+    // Wooden Siding Building
+    drawPixel(ctx, hotelX, hotelY, hotelW, hotelH, nesPalette.outline);
+    drawPixel(ctx, hotelX + 4, hotelY + 4, hotelW - 8, hotelH - 8, nesPalette.woodLight);
+
+    // Hotel Signboard Top
+    drawPixel(ctx, hotelX + 30, hotelY + 10, 140, 18, nesPalette.outline);
+    drawPixel(ctx, hotelX + 34, hotelY + 12, 132, 14, nesPalette.woodDark);
+
+    // Upper Floor Windows
+    drawPixel(ctx, hotelX + 20, hotelY + 38, 30, 32, nesPalette.outline);
+    drawPixel(ctx, hotelX + 85, hotelY + 38, 30, 32, nesPalette.outline);
+    drawPixel(ctx, hotelX + 150, hotelY + 38, 30, 32, nesPalette.outline);
+
+    // Hotel Balcony Trim
+    drawPixel(ctx, hotelX + 10, hotelY + 78, 180, 8, nesPalette.outline);
+    drawPixel(ctx, hotelX + 12, hotelY + 80, 176, 4, nesPalette.woodDark);
+
+    // Lower Floor Windows
+    drawPixel(ctx, hotelX + 30, hotelY + 96, 32, 36, nesPalette.outline);
+    drawPixel(ctx, hotelX + 138, hotelY + 96, 32, 36, nesPalette.outline);
+
+    // --- 3. TOWNSFOLK SPECTATORS ---
+    // Peeking from Saloon Upper Window
+    drawPixel(ctx, saloonX + 35, saloonY + 48, 12, 12, '#fce0a0');
+    drawPixel(ctx, saloonX + 33, saloonY + 44, 16, 6, nesPalette.outline);
+
+    // Standing in Hotel Window
+    drawPixel(ctx, hotelX + 92, hotelY + 44, 16, 16, nesPalette.outline);
+    drawPixel(ctx, hotelX + 94, hotelY + 46, 12, 12, '#fce0a0');
+
+    // --- 4. HITCHING POSTS & HORSE ---
+    // Wooden Rail Between Buildings
+    drawPixel(ctx, 215, groundY - 14, 110, 24, nesPalette.outline);
+    drawPixel(ctx, 217, groundY - 12, 106, 4, nesPalette.woodDark);
+    drawPixel(ctx, 225, groundY - 8, 6, 18, nesPalette.woodDark);
+    drawPixel(ctx, 305, groundY - 8, 6, 18, nesPalette.woodDark);
+
+    // 8-Bit Horse Tied to Rail
+    const horseX = 245;
+    const horseY = groundY - 32;
+    drawPixel(ctx, horseX, horseY, 42, 28, nesPalette.outline);
+    drawPixel(ctx, horseX + 2, horseY + 2, 38, 24, '#502814');
+    drawPixel(ctx, horseX + 32, horseY - 8, 12, 20, nesPalette.outline);
+    drawPixel(ctx, horseX + 34, horseY - 6, 8, 16, '#502814');
+    drawPixel(ctx, horseX + 4, horseY + 26, 6, 12, nesPalette.outline);
+    drawPixel(ctx, horseX + 28, horseY + 26, 6, 12, nesPalette.outline);
+
+    // --- 5. GROUND DIRT & TRACK ---
+    drawPixel(ctx, 0, groundY, width, height - groundY, nesPalette.ground);
+    drawPixel(ctx, 0, groundY + 42, width, 14, nesPalette.groundDark);
 }
 
 export function createRenderer(canvas) {
