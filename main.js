@@ -1,3 +1,4 @@
+// main.js
 import { createGame } from './game.js';
 
 const dom = {
@@ -26,7 +27,6 @@ const dom = {
 };
 
 const game = createGame(dom);
-
 game.boot();
 
 function scrollToGame() {
@@ -59,7 +59,11 @@ dom.playAgainButton.addEventListener('click', () => {
 });
 
 dom.backToMenuButton?.addEventListener('click', () => {
-    game.startMenu(); // Automatically calls audio.stopMusic()
+    game.startMenu();
+});
+
+dom.exitButton?.addEventListener('click', () => {
+    game.startMenu();
 });
 
 dom.scoresButton.addEventListener('click', () => {
@@ -90,17 +94,8 @@ window.addEventListener('keydown', (event) => {
     }
 
     if (event.code === 'Space' || event.code === 'Enter') {
-        // Prevent accidental draws if game is currently paused
-        if (game.isPaused()) {
-            return;
-        }
-
+        if (game.isPaused()) return;
         event.preventDefault();
         game.onDraw();
     }
-});
-
-// Future addition in main.js
-dom.exitButton?.addEventListener('click', () => {
-    game.startMenu(); // Calls audio.stopMusic() automatically
 });

@@ -4,35 +4,56 @@ import { loadBestWins, saveBestWins } from './storage.js';
 
 const phases = {
     menu: 'menu',
+    wanted: 'wanted',
     countdown: 'countdown',
     duel: 'duel',
     roundWin: 'roundWin',
     gameOver: 'gameOver',
 };
 
-const outfitPool = {
-    hats: ['#101522', '#243654', '#5c432c', '#6e2f35'],
-    bodies: ['#2f4368', '#5f7347', '#7a3d30', '#704d2c', '#4d6580'],
-    accents: ['#d7a65f', '#cf5e4d', '#79a67d', '#e2d19d'],
-};
-
-function pick(list) {
-    return list[Math.floor(Math.random() * list.length)];
-}
-
-function createOutfit(isPlayer = false) {
-    if (isPlayer) {
-        return {
-            hat: '#101522',
-            body: '#2f4368',
-            accent: '#d7a65f',
-        };
+const outlawRoster = [
+    {
+        name: "SNAKE-EYE SAM",
+        bounty: "$250",
+        delayMs: 380,
+        outfit: { hat: '#6e2f35', body: '#7a3d30', accent: '#e2d19d' }
+    },
+    {
+        name: "CALAMITY KATE",
+        bounty: "$500",
+        delayMs: 320,
+        outfit: { hat: '#101522', body: '#704d2c', accent: '#cf5e4d' }
+    },
+    {
+        name: "ONE-EYE PETE",
+        bounty: "$1,000",
+        delayMs: 260,
+        outfit: { hat: '#243654', body: '#4d6580', accent: '#79a67d' }
+    },
+    {
+        name: "DEADEYE DAN",
+        bounty: "$2,500",
+        delayMs: 200,
+        outfit: { hat: '#000000', body: '#242424', accent: '#d7a65f' }
     }
+];
+
+function getOutlawForRound(round) {
+    const index = (round - 1) % outlawRoster.length;
+    const base = outlawRoster[index];
+    const speedBoost = Math.floor((round - 1) / outlawRoster.length) * 20;
 
     return {
-        hat: pick(outfitPool.hats),
-        body: pick(outfitPool.bodies),
-        accent: pick(outfitPool.accents),
+        ...base,
+        currentDelay: Math.max(120, base.delayMs - speedBoost)
+    };
+}
+
+function createPlayerOutfit() {
+    return {
+        hat: '#101522',
+        body: '#2f4368',
+        accent: '#d7a65f',
     };
 }
 
@@ -67,8 +88,9 @@ export function createGame(dom) {
         tension: 0,
         progress: 0,
         countdownProgress: 0,
-        playerOutfit: createOutfit(true),
-        opponentOutfit: createOutfit(false),
+        playerOutfit: createPlayerOutfit(),
+        opponentOutfit: outlawRoster[0].outfit,
+        currentOutlaw: outlawRoster[0],
         playerDeathProgress: 0,
         opponentDeathProgress: 0,
         lastHitSide: null,
@@ -109,7 +131,7 @@ export function createGame(dom) {
 
     function showScreen(screenName) {
         dom.menuScreen.hidden = screenName !== phases.menu;
-        dom.gameScreen.hidden = screenName !== phases.countdown && screenName !== phases.duel && screenName !== phases.roundWin;
+        dom.gameScreen.hidden = screenName !== phases.wanted && screenName !== phases.countdown && screenName !== phases.duel && screenName !== phases.roundWin;
         dom.resultScreen.hidden = screenName !== phases.gameOver;
         dom.menuScreen.classList.toggle('is-active', screenName === phases.menu);
         syncControls();
@@ -149,7 +171,9 @@ export function createGame(dom) {
         const { type, payload } = state.pendingTransition;
         clearPendingTransition();
 
-        if (type === 'endGame') {
+        if (type === 'beginDuelCountdown') {
+            beginDuelCountdown();
+        } else if (type === 'endGame') {
             endGame(payload.reason);
         } else if (type === 'advanceRound') {
             advanceRound();
@@ -159,7 +183,6 @@ export function createGame(dom) {
     }
 
     function updateDifficulty() {
-        // Base randomized delay between 2.5s and 5.5s
         const minDelay = Math.max(1.5, 3.0 - state.round * 0.15);
         const maxDelay = Math.max(2.5, 5.5 - state.round * 0.2);
 
@@ -185,11 +208,27 @@ export function createGame(dom) {
 
     function startRound() {
         audio.unlock();
-        audio.stopMusic();  // Reset any previous playing loop
-        audio.startMusic(); // Start loop for active countdown/duel
-        state.phase = phases.countdown;
+        audio.stopMusic();
+
+        state.currentOutlaw = getOutlawForRound(state.round);
+        state.opponentOutfit = state.currentOutlaw.outfit;
+        state.playerOutfit = createPlayerOutfit();
+
+        state.phase = phases.wanted;
         state.isPaused = false;
         resetDeathStates();
+        clearPendingTransition();
+        showScreen(phases.wanted);
+        syncHud();
+        syncControls();
+        setStatus(`WANTED: ${state.currentOutlaw.name} - ${state.currentOutlaw.bounty}`);
+
+        scheduleTransition('beginDuelCountdown', 1800);
+    }
+
+    function beginDuelCountdown() {
+        audio.startMusic();
+        state.phase = phases.countdown;
         state.playerReady = true;
         state.playerHasDrawn = false;
         state.opponentReady = false;
@@ -198,20 +237,16 @@ export function createGame(dom) {
         state.countdownStart = performance.now();
         state.duelStartedAt = 0;
         state.duelResolutionAt = 0;
-        clearPendingTransition();
         state.phaseLabel = 'WAIT FOR IT';
-        state.playerOutfit = createOutfit(true);
-        state.opponentOutfit = createOutfit(false);
         updateDifficulty();
         showScreen(phases.countdown);
-        setStatus('Keep your hand steady. The outlaw will move first.');
-        syncHud();
+        setStatus(`Face off against ${state.currentOutlaw.name}! Keep your hand steady.`);
         syncControls();
         audio.playSignal();
     }
 
     function endGame(reason) {
-        audio.stopMusic(); // Stop music immediately on game over
+        audio.stopMusic();
         state.phase = phases.gameOver;
         state.isPaused = false;
         clearPendingTransition();
@@ -226,14 +261,14 @@ export function createGame(dom) {
         dom.resultMessage.textContent =
             reason === 'win'
                 ? 'You drew faster than the last gunslinger in the county.'
-                : 'The opponent fired before your hand reached the holster.';
+                : `${state.currentOutlaw.name} fired before your hand reached the holster.`;
         setStatus(reason === 'win' ? 'Winner.' : 'Game over.');
         syncControls();
         audio[reason === 'win' ? 'playVictory' : 'playLoss']();
     }
 
     function advanceRound() {
-        audio.stopMusic(); // HARD KILL lingering track notes instantly
+        audio.stopMusic();
         state.phase = phases.roundWin;
         clearPendingTransition();
         state.wins += 1;
@@ -249,46 +284,46 @@ export function createGame(dom) {
     }
 
     function resolveEarlyDraw() {
-        audio.stopMusic(); // STOP MUSIC IMMEDIATELY ON EARLY DRAW LOSS
+        audio.stopMusic();
         state.playerHasDrawn = true;
         state.phaseLabel = 'TOO EARLY';
-        state.playerDeathProgress = 0.18;
+        state.playerDeathProgress = 0.035;
         state.opponentDeathProgress = 0;
         state.lastHitSide = 'player';
         setStatus('You drew too soon and got clipped.');
         state.flash = 1;
         state.screenShake = 1;
         audio.playHit();
-        scheduleTransition('endGame', 450, { reason: 'loss' });
+        scheduleTransition('endGame', 800, { reason: 'loss' });
     }
 
     function resolveVictory() {
-        audio.stopMusic(); // STOP MUSIC IMMEDIATELY WHEN PLAYER WINS ROUND
+        audio.stopMusic();
         state.playerHasDrawn = true;
         state.opponentHasDrawn = true;
         state.phaseLabel = 'BANG';
-        state.opponentDeathProgress = 0.18;
+        state.opponentDeathProgress = 0.035;
         state.playerDeathProgress = 0;
         state.lastHitSide = 'opponent';
         setStatus('Clean draw. Move to the next showdown.');
         state.flash = 0.8;
         state.screenShake = 0.8;
         audio.playDraw();
-        scheduleTransition('advanceRound', 500);
+        scheduleTransition('advanceRound', 900);
     }
 
     function resolveLoss() {
-        audio.stopMusic(); // STOP MUSIC IMMEDIATELY WHEN PLAYER DIES
+        audio.stopMusic();
         state.opponentHasDrawn = true;
         state.phaseLabel = 'HIT';
-        state.playerDeathProgress = 0.18;
+        state.playerDeathProgress = 0.035;
         state.opponentDeathProgress = 0;
         state.lastHitSide = 'player';
-        setStatus('The outlaw fired first.');
+        setStatus(`${state.currentOutlaw.name} fired first.`);
         state.flash = 1;
         state.screenShake = 1;
         audio.playHit();
-        scheduleTransition('endGame', 420, { reason: 'loss' });
+        scheduleTransition('endGame', 800, { reason: 'loss' });
     }
 
     function togglePause() {
@@ -300,14 +335,14 @@ export function createGame(dom) {
             state.isPaused = true;
             state.pauseStartedAt = performance.now();
             state.phaseLabel = 'PAUSED';
-            audio.stopMusic(); // STOP MUSIC ON PAUSE
+            audio.stopMusic();
             setPausedStatus();
             syncControls();
             return state.isPaused;
         }
 
         resumeAfterPause(performance.now());
-        audio.startMusic(); // RESUME MUSIC ON UNPAUSE
+        audio.startMusic();
         if (state.phase === phases.countdown) {
             state.phaseLabel = 'WAIT FOR IT';
         }
@@ -355,7 +390,6 @@ export function createGame(dom) {
             return;
         }
 
-        // Change + 0.09 to + 0.035 for a smoother, gradual fall (~0.8 seconds total)
         if (state.playerDeathProgress > 0 && state.playerDeathProgress < 1) {
             state.playerDeathProgress = clamp(state.playerDeathProgress + 0.035, 0, 1);
         }
@@ -396,7 +430,7 @@ export function createGame(dom) {
             state.countdownProgress = 0;
             state.phaseLabel = duelElapsed < 350 ? 'DRAW!' : 'WHO IS FASTER?';
 
-            const opponentDelay = Math.max(130, 410 - state.round * 18);
+            const opponentDelay = state.currentOutlaw.currentDelay;
             if (!state.opponentHasDrawn && duelElapsed >= opponentDelay) {
                 resolveLoss();
             }
@@ -412,7 +446,7 @@ export function createGame(dom) {
     }
 
     function startMenu() {
-        audio.stopMusic(); // NO MUSIC ON MAIN MENU OR ON EXIT TO MENU
+        audio.stopMusic();
         state.phase = phases.menu;
         state.isPaused = false;
         state.round = 1;

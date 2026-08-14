@@ -290,6 +290,50 @@ function renderHogansBackground(ctx, width, height, tension, progress) {
     drawPixel(ctx, 0, groundY + 42, width, 14, nesPalette.groundDark);
 }
 
+// Render 8-Bit Wanted Poster Screen
+function drawWantedPoster(ctx, width, height, outlaw) {
+    const cardW = 320;
+    const cardH = 340;
+    const cardX = (width - cardW) / 2;
+    const cardY = (height - cardH) / 2;
+
+    // Darkened Background Overlay
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
+    ctx.fillRect(0, 0, width, height);
+
+    // Parchment Poster Frame
+    drawPixel(ctx, cardX - 6, cardY - 6, cardW + 12, cardH + 12, nesPalette.outline);
+    drawPixel(ctx, cardX, cardY, cardW, cardH, '#e4a058');
+    drawPixel(ctx, cardX + 8, cardY + 8, cardW - 16, cardH - 16, '#c4784c');
+
+    // Text Header
+    ctx.fillStyle = '#000000';
+    ctx.font = '24px "Press Start 2P", monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText("WANTED", width / 2, cardY + 50);
+
+    ctx.font = '12px "Press Start 2P", monospace';
+    ctx.fillText("DEAD OR ALIVE", width / 2, cardY + 75);
+
+    // Mugshot Box & Outlaw Sprite Rendering
+    const mugX = width / 2;
+    const mugY = cardY + 160;
+    drawPixel(ctx, mugX - 45, mugY - 55, 90, 90, nesPalette.outline);
+    drawPixel(ctx, mugX - 40, mugY - 50, 80, 80, '#884400');
+
+    // Render Outlaw Portrait
+    drawHogansCowboy(ctx, mugX, mugY - 10, outlaw.outfit, true, false);
+
+    // Name & Bounty Details
+    ctx.fillStyle = '#000000';
+    ctx.font = '14px "Press Start 2P", monospace';
+    ctx.fillText(outlaw.name, width / 2, cardY + 250);
+
+    ctx.fillStyle = '#882800';
+    ctx.font = '16px "Press Start 2P", monospace';
+    ctx.fillText(`REWARD ${outlaw.bounty}`, width / 2, cardY + 290);
+}
+
 export function createRenderer(canvas) {
     const context = canvas.getContext('2d');
     const width = canvas.width;
@@ -305,6 +349,13 @@ export function createRenderer(canvas) {
 
             context.save();
             context.translate(Math.floor(shakeX), Math.floor(shakeY));
+
+            if (state.phase === 'wanted') {
+                renderHogansBackground(context, width, height, 0, 0);
+                drawWantedPoster(context, width, height, state.currentOutlaw);
+                context.restore();
+                return;
+            }
 
             renderHogansBackground(context, width, height, state.tension, state.progress);
             drawTimerMeter(context, width, state.countdownProgress);
