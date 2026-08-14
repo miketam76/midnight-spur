@@ -1,115 +1,107 @@
-// render.js - Authentic 8-Bit Arcade Renderer
+// render.js - Hogan's Alley NES Zapper Arcade Aesthetic
 
-// Classic NES-inspired color palette
-const palette = {
-    skyTop: '#3c5c88',
-    skyMid: '#845c40',
-    skyBottom: '#c4784c',
-    mesaDark: '#502814',
-    mesaLight: '#783818',
-    ground: '#a05828',
-    groundDark: '#683018',
-    trail: '#d89c58',
-    outline: '#0f0b10', // Dark sprite outline
+const nesPalette = {
+    skyTop: '#000000',      // Pure black upper sky for iconic Zapper contrast
+    skyMid: '#442800',      // Deep rust orange sunset band
+    skyBottom: '#a84400',   // Vibrant orange horizon
+    ground: '#e4a058',     // Warm NES dirt track
+    groundDark: '#884400', // Deep dirt shadows
+    woodDark: '#442800',   // Target board framing
+    woodLight: '#a87038',  // Wood planking
+    outline: '#000000',    // Bold 8-bit black outlines
 };
 
-function drawRect(ctx, x, y, width, height, color) {
+function drawPixel(ctx, x, y, width, height, color) {
     ctx.fillStyle = color;
     ctx.fillRect(Math.floor(x), Math.floor(y), Math.floor(width), Math.floor(height));
 }
 
-// Draw authentic 8-bit detailed pixel-art Cowboy
-function draw8BitCowboy(ctx, x, y, outfit, facingLeft, drawArmUp) {
+// Draw Authentic Hogan's Alley Style Cowboy Sprite
+function drawHogansCowboy(ctx, x, y, outfit, facingLeft, drawArmUp) {
     const dir = facingLeft ? -1 : 1;
     const bodyColor = outfit.body;
     const hatColor = outfit.hat;
     const accentColor = outfit.accent;
     const skinColor = '#fcb070';
-    const skinShadow = '#c47038';
-    const gunColor = '#e0e0e0';
-    const OL = palette.outline;
+    const gunColor = '#fcfcfc'; // High contrast white/grey for 8-bit guns
+    const OL = nesPalette.outline;
 
     ctx.save();
     ctx.translate(Math.floor(x), Math.floor(y));
 
-    // Ground Shadow
-    drawRect(ctx, -18, 72, 36, 6, 'rgba(15, 11, 16, 0.4)');
+    // Ground Shadow (Solid blocky NES shadow)
+    drawPixel(ctx, -20, 70, 40, 6, 'rgba(0, 0, 0, 0.5)');
 
-    // --- HAT ---
-    drawRect(ctx, -22, -18, 44, 4, OL); // Hat Brim Outline
-    drawRect(ctx, -20, -16, 40, 4, hatColor);
-    drawRect(ctx, -14, -30, 28, 14, OL); // Crown Outline
-    drawRect(ctx, -12, -28, 24, 12, hatColor);
-    drawRect(ctx, -12, -20, 24, 4, accentColor); // Hatband
+    // --- HAT (Wide NES Brim) ---
+    drawPixel(ctx, -26, -22, 52, 6, OL);            // Brim Outline
+    drawPixel(ctx, -24, -20, 48, 4, hatColor);       // Brim Fill
+    drawPixel(ctx, -16, -36, 32, 16, OL);           // Crown Outline
+    drawPixel(ctx, -14, -34, 28, 14, hatColor);      // Crown Fill
+    drawPixel(ctx, -14, -24, 28, 4, accentColor);    // Vibrant Bandana/Hatband
 
-    // --- HEAD / FACE ---
-    drawRect(ctx, -10, -14, 20, 20, OL);
-    drawRect(ctx, -8, -12, 16, 16, skinColor);
+    // --- HEAD & FACE ---
+    drawPixel(ctx, -12, -16, 24, 22, OL);
+    drawPixel(ctx, -10, -14, 20, 18, skinColor);
 
-    // Eyes & Mustache (Facial detail)
-    const eyeX = dir * 2;
-    drawRect(ctx, eyeX - 2, -8, 4, 4, OL); // Eyes
-    drawRect(ctx, eyeX - 6, -2, 12, 4, '#502814'); // Mustache
+    // Hogan's Alley Expressive Features
+    const eyeX = dir * 3;
+    drawPixel(ctx, eyeX - 2, -10, 4, 6, OL);        // Large Expressive Eye
+    drawPixel(ctx, eyeX - 1, -9, 2, 2, '#ffffff');  // Eye Specular Highlight
+    drawPixel(ctx, eyeX - 6, -2, 12, 4, OL);         // Heavy Mustache / Jawline
 
-    // Bandana / Neckwear
-    drawRect(ctx, -8, 6, 16, 6, accentColor);
-    drawRect(ctx, -10, 8, 20, 2, OL);
+    // --- TORSO & VEST ---
+    drawPixel(ctx, -16, 6, 32, 34, OL);
+    drawPixel(ctx, -14, 8, 28, 30, bodyColor);
 
-    // --- TORSO & PONCHO / VEST ---
-    drawRect(ctx, -14, 12, 28, 30, OL);
-    drawRect(ctx, -12, 14, 24, 26, bodyColor);
+    // Scarf / Neckwear
+    drawPixel(ctx, -8, 6, 16, 8, accentColor);
 
-    // Vest detail / Buttons
-    drawRect(ctx, -2, 16, 4, 22, '#201828');
-    drawRect(ctx, dir * 4, 18, 2, 2, '#fcb070'); // Brass button
-    drawRect(ctx, dir * 4, 26, 2, 2, '#fcb070');
-
-    // Gun Belt & Holster
-    drawRect(ctx, -14, 38, 28, 6, '#502814'); // Belt
-    drawRect(ctx, -2, 38, 6, 6, '#e0e0e0'); // Buckle
-    drawRect(ctx, dir * 10 - 4, 42, 8, 12, '#381808'); // Holster
+    // Gun Belt & Large Buckle
+    drawPixel(ctx, -16, 34, 32, 6, '#442800');
+    drawPixel(ctx, -4, 34, 8, 6, '#fce0a0');        // Brass Buckle
 
     // --- LEGS & BOOTS ---
-    drawRect(ctx, -12, 44, 10, 24, OL); // Left Leg OL
-    drawRect(ctx, -10, 44, 6, 22, '#283858'); // Jeans
-    drawRect(ctx, 2, 44, 10, 24, OL);  // Right Leg OL
-    drawRect(ctx, 4, 44, 6, 22, '#182840');
+    drawPixel(ctx, -14, 40, 12, 28, OL);
+    drawPixel(ctx, -12, 42, 8, 24, '#203864');       // Classic Blue Jeans
+    drawPixel(ctx, 2, 40, 12, 28, OL);
+    drawPixel(ctx, 4, 42, 8, 24, '#142444');
 
-    // Cowboy Boots
-    drawRect(ctx, -12, 64, 10, 8, '#381808');
-    drawRect(ctx, 2, 64, 10, 8, '#281000');
+    // Heavy Boots
+    drawPixel(ctx, -16, 62, 14, 8, OL);
+    drawPixel(ctx, -14, 64, 10, 6, '#442800');
+    drawPixel(ctx, 2, 62, 14, 8, OL);
+    drawPixel(ctx, 4, 64, 10, 6, '#442800');
 
-    // --- ARM & GUN ANIMATION ---
+    // --- ARM & GUN POSES ---
     if (drawArmUp) {
-        // Arm Extended (Shooting Pose)
-        drawRect(ctx, dir * 10, 10, 18 * dir, 10, OL);
-        drawRect(ctx, dir * 12, 12, 14 * dir, 6, bodyColor);
-        drawRect(ctx, dir * 26, 12, 8 * dir, 6, skinColor); // Hand
+        // Shooting Pose (Straight arm out with high-contrast Zapper-style revolver)
+        drawPixel(ctx, dir * 12, 10, 20 * dir, 10, OL);
+        drawPixel(ctx, dir * 14, 12, 16 * dir, 6, bodyColor);
+        drawPixel(ctx, dir * 30, 12, 8 * dir, 6, skinColor);
 
-        // Revolver Pistol Sprite
-        drawRect(ctx, dir * 32, 4, 16 * dir, 6, OL);
-        drawRect(ctx, dir * 34, 6, 12 * dir, 4, gunColor); // Barrel
-        drawRect(ctx, dir * 28, 10, 6 * dir, 8, '#502814'); // Handle
+        // Revolver Pistol
+        drawPixel(ctx, dir * 36, 4, 18 * dir, 8, OL);
+        drawPixel(ctx, dir * 38, 6, 14 * dir, 4, gunColor);  // Chrome Barrel
+        drawPixel(ctx, dir * 32, 10, 6 * dir, 8, '#442800'); // Wooden Grip
     } else {
-        // Arm Idle at Holster
-        drawRect(ctx, dir * 10, 16, 8 * dir, 18, OL);
-        drawRect(ctx, dir * 11, 18, 6 * dir, 14, bodyColor);
-        drawRect(ctx, dir * 10, 32, 6 * dir, 6, skinColor);
+        // Idle Holster Pose (Hand resting low over gun belt)
+        drawPixel(ctx, dir * 12, 12, 10 * dir, 20, OL);
+        drawPixel(ctx, dir * 14, 14, 6 * dir, 16, bodyColor);
+        drawPixel(ctx, dir * 12, 28, 8 * dir, 8, skinColor); // Hand hovering at hip
     }
 
     ctx.restore();
 }
 
-// Multi-Stage 8-Bit Fall Animation (With readable downed sprite!)
-function draw8BitFallenCowboy(ctx, x, y, outfit, facingLeft, progress) {
+// Downed Sprite Animation (Hogan's Alley Style Fall)
+function drawHogansFallenCowboy(ctx, x, y, outfit, facingLeft, progress) {
     const dir = facingLeft ? -1 : 1;
     const fallDir = facingLeft ? 1 : -1;
     const bodyColor = outfit.body;
     const hatColor = outfit.hat;
-    const accentColor = outfit.accent;
     const skinColor = '#fcb070';
-    const gunColor = '#e0e0e0';
-    const OL = palette.outline;
+    const gunColor = '#fcfcfc';
+    const OL = nesPalette.outline;
 
     const fall = Math.min(1, Math.max(0, progress));
 
@@ -119,90 +111,106 @@ function draw8BitFallenCowboy(ctx, x, y, outfit, facingLeft, progress) {
     let bodyY = y;
 
     if (fall < 0.3) {
-        // Stage 1: Recoil / Stagger back
         const t = fall / 0.3;
         bodyX = x + t * 8 * fallDir;
         bodyY = y - t * 4;
     } else if (fall < 0.7) {
-        // Stage 2: Knee buckle & drop
         const t = (fall - 0.3) / 0.4;
         bodyX = x + 8 * fallDir + t * 14 * fallDir;
         bodyY = y - 4 + t * 24;
     } else {
-        // Stage 3: Rest on dirt
         bodyX = x + 22 * fallDir;
         bodyY = y + 20;
     }
 
-    // Expanding Ground Shadow
-    const shadowWidth = 38 + fall * 18;
-    drawRect(ctx, bodyX - shadowWidth / 2, y + 72, shadowWidth, 6, 'rgba(15, 11, 16, 0.4)');
+    // Shadow
+    drawPixel(ctx, bodyX - 24, y + 68, 48, 6, 'rgba(0, 0, 0, 0.5)');
 
     // Flying Hat Arc
-    const hatX = x + fall * 34 * fallDir;
-    const hatY = y - 20 - Math.sin(fall * Math.PI) * 22 + fall * 86;
-    drawRect(ctx, hatX - 10, hatY, 20, 6, OL);
-    drawRect(ctx, hatX - 8, hatY + 2, 16, 4, hatColor);
-    drawRect(ctx, hatX - 4, hatY - 2, 8, 4, hatColor);
+    const hatX = x + fall * 36 * fallDir;
+    const hatY = y - 20 - Math.sin(fall * Math.PI) * 24 + fall * 86;
+    drawPixel(ctx, hatX - 12, hatY, 24, 8, OL);
+    drawPixel(ctx, hatX - 10, hatY + 2, 20, 4, hatColor);
 
-    // Dropped Revolver
-    const gunX = x + fall * 28 * fallDir;
+    // Flying Revolver
+    const gunX = x + fall * 30 * fallDir;
     const gunY = y + 36 + fall * 32;
-    drawRect(ctx, gunX, gunY, 10 * dir, 4, OL);
-    drawRect(ctx, gunX + 2 * dir, gunY + 1, 6 * dir, 2, gunColor);
-
-    // Dust Cloud at Impact
-    if (fall > 0.65) {
-        const dustAlpha = Math.max(0, 1 - (fall - 0.65) / 0.35);
-        const puffSize = Math.min(12, (fall - 0.65) * 35);
-        drawRect(ctx, bodyX - 18 * fallDir, y + 66, puffSize, puffSize / 2, `rgba(216, 156, 88, ${dustAlpha})`);
-        drawRect(ctx, bodyX + 12 * fallDir, y + 68, puffSize * 0.8, puffSize / 2, `rgba(216, 156, 88, ${dustAlpha})`);
-    }
+    drawPixel(ctx, gunX, gunY, 12 * dir, 6, OL);
+    drawPixel(ctx, gunX + 2 * dir, gunY + 2, 8 * dir, 2, gunColor);
 
     ctx.translate(Math.floor(bodyX), Math.floor(bodyY));
 
     if (fall < 0.3) {
-        // Stage 1: Recoil Pose
-        drawRect(ctx, -14, 12, 28, 30, OL);
-        drawRect(ctx, -12, 14, 24, 26, bodyColor);
-        drawRect(ctx, -10, -12, 20, 20, OL);
-        drawRect(ctx, -8, -10, 16, 16, skinColor);
-        drawRect(ctx, -12, 44, 24, 28, OL);
+        // Recoil Pose
+        drawPixel(ctx, -16, 8, 32, 32, OL);
+        drawPixel(ctx, -14, 10, 28, 28, bodyColor);
+        drawPixel(ctx, -12, -14, 24, 22, OL);
+        drawPixel(ctx, -10, -12, 20, 18, skinColor);
     } else if (fall < 0.7) {
-        // Stage 2: Slumped Knee-Buckle Pose
-        drawRect(ctx, -18, 20, 36, 24, OL);
-        drawRect(ctx, -16, 22, 32, 20, bodyColor);
-        drawRect(ctx, -12, 10, 18, 18, OL);
-        drawRect(ctx, -10, 12, 14, 14, skinColor);
-        drawRect(ctx, -20, 42, 40, 16, OL);
+        // Knee Buckle
+        drawPixel(ctx, -20, 16, 40, 28, OL);
+        drawPixel(ctx, -18, 18, 36, 24, bodyColor);
+        drawPixel(ctx, -14, 6, 20, 20, OL);
+        drawPixel(ctx, -12, 8, 16, 16, skinColor);
     } else {
-        // Stage 3: PROPER DOWNED COWBOY SPRITE (Full 3D depth, no pancake!)
+        // Full Downed Profile Sprite
         const headX = fallDir * 18;
 
-        // Boots & Legs on Ground
-        drawRect(ctx, -headX - 6, 44, 12, 8, OL); // Boots
-        drawRect(ctx, -headX - 4, 46, 8, 4, '#381808');
-        drawRect(ctx, -headX + 2, 40, 20, 10, OL); // Jeans/Legs
-        drawRect(ctx, -headX + 4, 42, 16, 6, '#283858');
+        // Boots & Legs
+        drawPixel(ctx, -headX - 8, 42, 16, 10, OL);
+        drawPixel(ctx, -headX - 6, 44, 12, 6, '#442800');
+        drawPixel(ctx, -headX + 2, 38, 22, 12, OL);
+        drawPixel(ctx, -headX + 4, 40, 18, 8, '#203864');
 
-        // Torso / Vest on Side
-        drawRect(ctx, -14, 30, 28, 18, OL);
-        drawRect(ctx, -12, 32, 24, 14, bodyColor);
-        drawRect(ctx, -10, 36, 20, 4, accentColor); // Belt line
+        // Torso
+        drawPixel(ctx, -16, 26, 32, 20, OL);
+        drawPixel(ctx, -14, 28, 28, 16, bodyColor);
 
-        // Outstretched Arm
-        drawRect(ctx, headX - 6, 38, 14 * fallDir, 6, OL);
-        drawRect(ctx, headX - 4, 40, 10 * fallDir, 2, skinColor);
-
-        // Head in Profile on Dirt
-        drawRect(ctx, headX - 8, 22, 16, 16, OL);
-        drawRect(ctx, headX - 6, 24, 12, 12, skinColor);
-        drawRect(ctx, headX - 4, 28, 8, 4, '#502814'); // Hair/Mustache profile
+        // Head resting on dirt
+        drawPixel(ctx, headX - 10, 20, 18, 18, OL);
+        drawPixel(ctx, headX - 8, 22, 14, 14, skinColor);
+        drawPixel(ctx, headX - 6, 28, 10, 4, OL); // Mustache line
     }
 
     ctx.restore();
 }
 
+// Hogan's Alley Range Scene Background
+function renderHogansBackground(ctx, width, height, tension, progress) {
+    const skySplit = Math.floor(height * 0.50);
+
+    // Stark 8-Bit Sky Banding
+    drawPixel(ctx, 0, 0, width, skySplit * 0.4, nesPalette.skyTop);
+    drawPixel(ctx, 0, skySplit * 0.4, width, skySplit * 0.3, nesPalette.skyMid);
+    drawPixel(ctx, 0, skySplit * 0.7, width, skySplit * 0.3, nesPalette.skyBottom);
+
+    // Hogan's Alley Brick Cutout Buildings & Wooden Range Scenery
+    const fenceY = skySplit - 40;
+
+    // Left Brick Saloon Cutout
+    drawPixel(ctx, 20, fenceY - 20, 140, 60, nesPalette.outline);
+    drawPixel(ctx, 24, fenceY - 16, 132, 52, '#882800'); // Red Brick
+    drawPixel(ctx, 40, fenceY - 8, 30, 24, nesPalette.outline); // Window
+    drawPixel(ctx, 90, fenceY - 8, 30, 24, nesPalette.outline);
+
+    // Right Wooden Storefront Cutout
+    drawPixel(ctx, width - 180, fenceY - 30, 150, 70, nesPalette.outline);
+    drawPixel(ctx, width - 176, fenceY - 26, 142, 62, nesPalette.woodLight);
+    drawPixel(ctx, width - 160, fenceY - 16, 110, 8, nesPalette.woodDark); // Signboard
+
+    // Wooden Range Stand Planks
+    drawPixel(ctx, 0, fenceY + 20, width, 20, nesPalette.outline);
+    drawPixel(ctx, 0, fenceY + 22, width, 16, nesPalette.woodDark);
+
+    // Ground Shooting Range Dirt
+    drawPixel(ctx, 0, skySplit, width, height - skySplit, nesPalette.ground);
+    drawPixel(ctx, 0, skySplit + 42, width, 14, nesPalette.groundDark);
+
+    // Target Track Groove Line on Floor
+    drawPixel(ctx, width * 0.15, skySplit + 20, width * 0.7, 4, nesPalette.outline);
+}
+
+// 8-Bit Wooden Frame Countdown Bar
 function drawTimerMeter(ctx, width, progress) {
     const meterWidth = Math.round(width * 0.58);
     const meterHeight = 16;
@@ -210,17 +218,13 @@ function drawTimerMeter(ctx, width, progress) {
     const meterY = 18;
     const fillWidth = Math.round(meterWidth * progress);
 
-    // 8-Bit Outer Wooden Frame
-    drawRect(ctx, meterX - 6, meterY - 6, meterWidth + 12, meterHeight + 12, palette.outline);
-    drawRect(ctx, meterX - 4, meterY - 4, meterWidth + 8, meterHeight + 8, '#502814');
+    drawPixel(ctx, meterX - 6, meterY - 6, meterWidth + 12, meterHeight + 12, nesPalette.outline);
+    drawPixel(ctx, meterX - 4, meterY - 4, meterWidth + 8, meterHeight + 8, nesPalette.woodDark);
+    drawPixel(ctx, meterX, meterY, meterWidth, meterHeight, '#000000');
 
-    // Meter Inner Groove
-    drawRect(ctx, meterX, meterY, meterWidth, meterHeight, '#180f08');
-
-    // Active Countdown Bar Fill
     if (fillWidth > 0) {
-        drawRect(ctx, meterX, meterY, fillWidth, meterHeight, '#d89c58');
-        drawRect(ctx, meterX, meterY, fillWidth, 4, '#fce0a0'); // Highlight top edge
+        drawPixel(ctx, meterX, meterY, fillWidth, meterHeight, '#fce0a0');
+        drawPixel(ctx, meterX, meterY, fillWidth, 4, '#ffffff');
     }
 }
 
@@ -229,39 +233,7 @@ export function createRenderer(canvas) {
     const width = canvas.width;
     const height = canvas.height;
 
-    // Crisp pixelated rendering setting
     context.imageSmoothingEnabled = false;
-
-    function renderBackground(tension, progress) {
-        const skySplit = Math.floor(height * 0.52);
-
-        // Banded 8-Bit Sunset Sky (No smooth gradients)
-        drawRect(context, 0, 0, width, skySplit * 0.35, palette.skyTop);
-        drawRect(context, 0, skySplit * 0.35, width, skySplit * 0.35, palette.skyMid);
-        drawRect(context, 0, skySplit * 0.70, width, skySplit * 0.30, palette.skyBottom);
-
-        // 8-Bit Distant Mountain Mesas
-        const mesaY = skySplit - 48;
-        drawRect(context, 40, mesaY + 12, 120, 36, palette.mesaDark);
-        drawRect(context, 60, mesaY, 80, 12, palette.mesaDark);
-        drawRect(context, 480, mesaY + 18, 180, 30, palette.mesaDark);
-        drawRect(context, 510, mesaY + 6, 120, 12, palette.mesaDark);
-
-        // Saloon & Fence Pixel Silhouettes
-        drawRect(context, 260, skySplit - 32, 90, 32, '#201008'); // Building
-        drawRect(context, 280, skySplit - 44, 50, 12, '#201008'); // Signboard
-        drawRect(context, 0, skySplit - 12, width, 12, '#381808');  // Fence line
-
-        // Ground Dirt Terrain
-        drawRect(context, 0, skySplit, width, height - skySplit, palette.ground);
-        drawRect(context, 0, skySplit + 40, width, 12, palette.groundDark);
-
-        // Animated Rolling Tumbleweed (8-bit detail)
-        const tumbleX = (progress * 800) % (width + 60) - 30;
-        const tumbleY = skySplit + 60;
-        drawRect(context, tumbleX, tumbleY, 12, 12, '#805020');
-        drawRect(context, tumbleX + 2, tumbleY + 2, 8, 8, '#d89c58');
-    }
 
     return {
         render(state) {
@@ -272,52 +244,34 @@ export function createRenderer(canvas) {
             context.save();
             context.translate(Math.floor(shakeX), Math.floor(shakeY));
 
-            // Render Scenery
-            renderBackground(state.tension, state.progress);
-
-            // RENDER THE COUNTDOWN BAR HERE
+            renderHogansBackground(context, width, height, state.tension, state.progress);
             drawTimerMeter(context, width, state.countdownProgress);
 
             const playerX = width * 0.26;
             const opponentX = width * 0.74;
-            const cowboyY = height * 0.42;
+            const cowboyY = height * 0.40;
 
-
-            // Draw Player (Arm ONLY goes up if playerHasDrawn is true)
+            // Player Render (Arm ONLY goes up if playerHasDrawn is true)
             if (state.playerDeathProgress > 0) {
-                draw8BitFallenCowboy(context, playerX, cowboyY, state.playerOutfit, false, state.playerDeathProgress);
+                drawHogansFallenCowboy(context, playerX, cowboyY, state.playerOutfit, false, state.playerDeathProgress);
             } else {
-                draw8BitCowboy(
-                    context,
-                    playerX,
-                    cowboyY,
-                    state.playerOutfit,
-                    false,
-                    state.playerHasDrawn // <--- Updated: Only true after firing
-                );
+                drawHogansCowboy(context, playerX, cowboyY, state.playerOutfit, false, state.playerHasDrawn);
             }
 
-            // Draw Opponent (Arm ONLY goes up if opponentHasDrawn is true)
+            // Opponent Render (Arm ONLY goes up if opponentHasDrawn is true)
             if (state.opponentDeathProgress > 0) {
-                draw8BitFallenCowboy(context, opponentX, cowboyY, state.opponentOutfit, true, state.opponentDeathProgress);
+                drawHogansFallenCowboy(context, opponentX, cowboyY, state.opponentOutfit, true, state.opponentDeathProgress);
             } else {
-                draw8BitCowboy(
-                    context,
-                    opponentX,
-                    cowboyY,
-                    state.opponentOutfit,
-                    true,
-                    state.opponentHasDrawn // <--- Updated: Only true after firing
-                );
+                drawHogansCowboy(context, opponentX, cowboyY, state.opponentOutfit, true, state.opponentHasDrawn);
             }
 
-            // Draw Phase Text ("DRAW!", "PAUSED", etc.)
-            context.fillStyle = '#f1e8cf';
+            // Phase Text Overlay
+            context.fillStyle = '#fce0a0';
             context.font = '28px "Press Start 2P", monospace';
             context.textAlign = 'center';
             context.fillText(state.phaseLabel, width / 2, height - 44);
 
-            // Screen Flash on Shot
+            // Screen Flash
             if (state.flash) {
                 context.fillStyle = `rgba(255, 255, 255, ${state.flash})`;
                 context.fillRect(0, 0, width, height);
