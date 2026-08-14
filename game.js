@@ -355,12 +355,13 @@ export function createGame(dom) {
             return;
         }
 
+        // Change + 0.09 to + 0.035 for a smoother, gradual fall (~0.8 seconds total)
         if (state.playerDeathProgress > 0 && state.playerDeathProgress < 1) {
-            state.playerDeathProgress = clamp(state.playerDeathProgress + 0.09, 0, 1);
+            state.playerDeathProgress = clamp(state.playerDeathProgress + 0.035, 0, 1);
         }
 
         if (state.opponentDeathProgress > 0 && state.opponentDeathProgress < 1) {
-            state.opponentDeathProgress = clamp(state.opponentDeathProgress + 0.09, 0, 1);
+            state.opponentDeathProgress = clamp(state.opponentDeathProgress + 0.035, 0, 1);
         }
 
         state.screenShake = Math.max(0, state.screenShake - 0.08);

@@ -100,28 +100,105 @@ function draw8BitCowboy(ctx, x, y, outfit, facingLeft, drawArmUp) {
     ctx.restore();
 }
 
-// 8-Bit Defeated Cowboy Pose
+// Multi-Stage 8-Bit Fall Animation (With readable downed sprite!)
 function draw8BitFallenCowboy(ctx, x, y, outfit, facingLeft, progress) {
     const dir = facingLeft ? -1 : 1;
-    const collapse = Math.min(1, Math.max(0, progress));
-    const fallY = y + collapse * 20;
+    const fallDir = facingLeft ? 1 : -1;
+    const bodyColor = outfit.body;
+    const hatColor = outfit.hat;
+    const accentColor = outfit.accent;
+    const skinColor = '#fcb070';
+    const gunColor = '#e0e0e0';
+    const OL = palette.outline;
+
+    const fall = Math.min(1, Math.max(0, progress));
 
     ctx.save();
-    ctx.translate(Math.floor(x + collapse * 20 * dir), Math.floor(fallY));
 
-    // Ground Shadow
-    drawRect(ctx, -26, 40, 52, 6, 'rgba(15, 11, 16, 0.5)');
+    let bodyX = x;
+    let bodyY = y;
 
-    // Fallen Body (Horizontal 8-bit layout)
-    drawRect(ctx, -28, 20, 56, 18, palette.outline);
-    drawRect(ctx, -26, 22, 52, 14, outfit.body);
+    if (fall < 0.3) {
+        // Stage 1: Recoil / Stagger back
+        const t = fall / 0.3;
+        bodyX = x + t * 8 * fallDir;
+        bodyY = y - t * 4;
+    } else if (fall < 0.7) {
+        // Stage 2: Knee buckle & drop
+        const t = (fall - 0.3) / 0.4;
+        bodyX = x + 8 * fallDir + t * 14 * fallDir;
+        bodyY = y - 4 + t * 24;
+    } else {
+        // Stage 3: Rest on dirt
+        bodyX = x + 22 * fallDir;
+        bodyY = y + 20;
+    }
 
-    // Dropped Hat on Ground
-    drawRect(ctx, -dir * 32, 26, 20, 10, palette.outline);
-    drawRect(ctx, -dir * 30, 28, 16, 6, outfit.hat);
+    // Expanding Ground Shadow
+    const shadowWidth = 38 + fall * 18;
+    drawRect(ctx, bodyX - shadowWidth / 2, y + 72, shadowWidth, 6, 'rgba(15, 11, 16, 0.4)');
 
-    // Dropped Gun
-    drawRect(ctx, dir * 28, 30, 12 * dir, 4, '#e0e0e0');
+    // Flying Hat Arc
+    const hatX = x + fall * 34 * fallDir;
+    const hatY = y - 20 - Math.sin(fall * Math.PI) * 22 + fall * 86;
+    drawRect(ctx, hatX - 10, hatY, 20, 6, OL);
+    drawRect(ctx, hatX - 8, hatY + 2, 16, 4, hatColor);
+    drawRect(ctx, hatX - 4, hatY - 2, 8, 4, hatColor);
+
+    // Dropped Revolver
+    const gunX = x + fall * 28 * fallDir;
+    const gunY = y + 36 + fall * 32;
+    drawRect(ctx, gunX, gunY, 10 * dir, 4, OL);
+    drawRect(ctx, gunX + 2 * dir, gunY + 1, 6 * dir, 2, gunColor);
+
+    // Dust Cloud at Impact
+    if (fall > 0.65) {
+        const dustAlpha = Math.max(0, 1 - (fall - 0.65) / 0.35);
+        const puffSize = Math.min(12, (fall - 0.65) * 35);
+        drawRect(ctx, bodyX - 18 * fallDir, y + 66, puffSize, puffSize / 2, `rgba(216, 156, 88, ${dustAlpha})`);
+        drawRect(ctx, bodyX + 12 * fallDir, y + 68, puffSize * 0.8, puffSize / 2, `rgba(216, 156, 88, ${dustAlpha})`);
+    }
+
+    ctx.translate(Math.floor(bodyX), Math.floor(bodyY));
+
+    if (fall < 0.3) {
+        // Stage 1: Recoil Pose
+        drawRect(ctx, -14, 12, 28, 30, OL);
+        drawRect(ctx, -12, 14, 24, 26, bodyColor);
+        drawRect(ctx, -10, -12, 20, 20, OL);
+        drawRect(ctx, -8, -10, 16, 16, skinColor);
+        drawRect(ctx, -12, 44, 24, 28, OL);
+    } else if (fall < 0.7) {
+        // Stage 2: Slumped Knee-Buckle Pose
+        drawRect(ctx, -18, 20, 36, 24, OL);
+        drawRect(ctx, -16, 22, 32, 20, bodyColor);
+        drawRect(ctx, -12, 10, 18, 18, OL);
+        drawRect(ctx, -10, 12, 14, 14, skinColor);
+        drawRect(ctx, -20, 42, 40, 16, OL);
+    } else {
+        // Stage 3: PROPER DOWNED COWBOY SPRITE (Full 3D depth, no pancake!)
+        const headX = fallDir * 18;
+
+        // Boots & Legs on Ground
+        drawRect(ctx, -headX - 6, 44, 12, 8, OL); // Boots
+        drawRect(ctx, -headX - 4, 46, 8, 4, '#381808');
+        drawRect(ctx, -headX + 2, 40, 20, 10, OL); // Jeans/Legs
+        drawRect(ctx, -headX + 4, 42, 16, 6, '#283858');
+
+        // Torso / Vest on Side
+        drawRect(ctx, -14, 30, 28, 18, OL);
+        drawRect(ctx, -12, 32, 24, 14, bodyColor);
+        drawRect(ctx, -10, 36, 20, 4, accentColor); // Belt line
+
+        // Outstretched Arm
+        drawRect(ctx, headX - 6, 38, 14 * fallDir, 6, OL);
+        drawRect(ctx, headX - 4, 40, 10 * fallDir, 2, skinColor);
+
+        // Head in Profile on Dirt
+        drawRect(ctx, headX - 8, 22, 16, 16, OL);
+        drawRect(ctx, headX - 6, 24, 12, 12, skinColor);
+        drawRect(ctx, headX - 4, 28, 8, 4, '#502814'); // Hair/Mustache profile
+    }
 
     ctx.restore();
 }
@@ -205,17 +282,33 @@ export function createRenderer(canvas) {
             const opponentX = width * 0.74;
             const cowboyY = height * 0.42;
 
-            // Draw Player & Opponent
+
+            // Draw Player (Arm ONLY goes up if playerHasDrawn is true)
             if (state.playerDeathProgress > 0) {
                 draw8BitFallenCowboy(context, playerX, cowboyY, state.playerOutfit, false, state.playerDeathProgress);
             } else {
-                draw8BitCowboy(context, playerX, cowboyY, state.playerOutfit, false, state.playerReady || state.playerHasDrawn);
+                draw8BitCowboy(
+                    context,
+                    playerX,
+                    cowboyY,
+                    state.playerOutfit,
+                    false,
+                    state.playerHasDrawn // <--- Updated: Only true after firing
+                );
             }
 
+            // Draw Opponent (Arm ONLY goes up if opponentHasDrawn is true)
             if (state.opponentDeathProgress > 0) {
                 draw8BitFallenCowboy(context, opponentX, cowboyY, state.opponentOutfit, true, state.opponentDeathProgress);
             } else {
-                draw8BitCowboy(context, opponentX, cowboyY, state.opponentOutfit, true, state.opponentHasDrawn || state.opponentReady);
+                draw8BitCowboy(
+                    context,
+                    opponentX,
+                    cowboyY,
+                    state.opponentOutfit,
+                    true,
+                    state.opponentHasDrawn // <--- Updated: Only true after firing
+                );
             }
 
             // Draw Phase Text ("DRAW!", "PAUSED", etc.)
