@@ -1,20 +1,15 @@
-// render.js - High-Density 16-Bit Arcade Renderer (Sunset Riders / Wild Guns Style)
+// render.js - High-Density 16-Bit Arcade Renderer with Unique Hero Sprite
 
 const snesPalette = {
-    skyTop: '#080c18',
-    skyUpper: '#181224',
-    skyMid: '#381622',
-    skyWarm: '#782618',
-    skyHorizon: '#c85c14',
-    skyGlow: '#f4a034',
-    mesaDark: '#281014',
-    mesaLight: '#4a1e18',
-    boardwalk: '#b07844',
-    boardwalkPlank: '#8c582c',
-    boardwalkShadow: '#5c3418',
-    streetDirt: '#b87438',
-    streetRut: '#7a421c',
-    streetDeep: '#50280c',
+    skyTop: '#0a0d1a',
+    skyUpper: '#2c1820',
+    skyMid: '#642818',
+    skyHorizon: '#a84c10',
+    boardwalk: '#a87848',
+    boardwalkPlank: '#78502c',
+    streetDirt: '#b87034',
+    streetRut: '#884c1c',
+    streetDeep: '#6c3810',
     outline: '#000000',
 };
 
@@ -23,7 +18,7 @@ function drawPixel(ctx, x, y, width, height, color) {
     ctx.fillRect(Math.floor(x), Math.floor(y), Math.floor(width), Math.floor(height));
 }
 
-// 16-Bit Timer Bar with Brass Studs and Gradient Fill
+// 16-Bit Timer Bar
 function drawTimerMeter(ctx, width, progress) {
     const meterWidth = Math.round(width * 0.56);
     const meterHeight = 14;
@@ -31,17 +26,14 @@ function drawTimerMeter(ctx, width, progress) {
     const meterY = 16;
     const fillWidth = Math.round(meterWidth * progress);
 
-    // Carved Walnut Bezel
     drawPixel(ctx, meterX - 5, meterY - 5, meterWidth + 10, meterHeight + 10, snesPalette.outline);
     drawPixel(ctx, meterX - 4, meterY - 4, meterWidth + 8, meterHeight + 8, '#2a1408');
     drawPixel(ctx, meterX - 2, meterY - 2, meterWidth + 4, meterHeight + 4, '#582c12');
     drawPixel(ctx, meterX, meterY, meterWidth, meterHeight, '#100806');
 
-    // Brass Inlay Studs
     drawPixel(ctx, meterX - 3, meterY + 4, 2, 2, '#fce0a0');
     drawPixel(ctx, meterX + meterWidth + 1, meterY + 4, 2, 2, '#fce0a0');
 
-    // Liquid/Energy Fill Meter
     if (fillWidth > 0) {
         drawPixel(ctx, meterX, meterY, fillWidth, 3, '#fff4cc');
         drawPixel(ctx, meterX, meterY + 3, fillWidth, 5, '#e8aa34');
@@ -50,7 +42,134 @@ function drawTimerMeter(ctx, width, progress) {
     }
 }
 
-// 16-Bit Cowboy Sprite (High density with facial detail, vest seams, denim shading, & holster gear)
+// --- UNIQUE HERO SPRITE: High-Contrast Western Gunslinger ---
+function drawHeroVanCleef(ctx, x, y, drawArmUp) {
+    const skinBase = '#f4b884';
+    const skinShadow = '#b86c40';
+    // High-contrast pale silver-belly Stetson
+    const hatLight = '#ede6d6';
+    const hatMid = '#d2c4b0';
+    const hatShadow = '#9a8a76';
+    const darkVest = '#202028';
+    const silver = '#d0d0dc';
+    const OL = snesPalette.outline;
+
+    ctx.save();
+    ctx.translate(Math.floor(x), Math.floor(y));
+
+    // Ground Shadow
+    drawPixel(ctx, -24, 70, 48, 6, 'rgba(0, 0, 0, 0.45)');
+
+    // --- 1. HIGH-CONTRAST SILVER-BELLY STETSON HAT ---
+    // Curved Brim (Ends kick upward sharply)
+    drawPixel(ctx, -32, -26, 4, 6, OL);
+    drawPixel(ctx, -30, -24, 2, 4, hatLight);
+    drawPixel(ctx, -28, -22, 56, 4, OL);           // Main brim outline
+    drawPixel(ctx, -26, -20, 52, 3, hatLight);     // Main brim highlight
+    drawPixel(ctx, -26, -18, 52, 1, hatShadow);    // Under-brim cast shadow
+    drawPixel(ctx, 24, -22, 4, 2, hatLight);
+    drawPixel(ctx, 26, -26, 4, 6, OL);
+    drawPixel(ctx, 26, -24, 2, 4, hatLight);
+
+    // Taller Western Crown with Deep Cattleman Crease
+    drawPixel(ctx, -16, -42, 32, 22, OL);
+    drawPixel(ctx, -14, -40, 28, 20, hatMid);
+    drawPixel(ctx, -12, -40, 24, 4, hatLight);     // Crown top highlight
+    drawPixel(ctx, -6, -42, 12, 4, OL);            // Center pinch notch
+    drawPixel(ctx, -4, -40, 8, 3, hatShadow);      // Crease shadow
+    drawPixel(ctx, -14, -36, 4, 14, hatShadow);    // Side taper shadow
+
+    // Dark Leather Hatband with Silver Concho
+    drawPixel(ctx, -14, -24, 28, 4, '#38180c');
+    drawPixel(ctx, -14, -22, 28, 1, '#603018');
+    drawPixel(ctx, 2, -24, 4, 4, silver);          // Silver Concho
+
+    // --- 2. HERO'S FACE & FEATURES ---
+    drawPixel(ctx, -12, -17, 24, 23, OL);
+    drawPixel(ctx, -10, -15, 20, 19, skinBase);
+    drawPixel(ctx, -10, -3, 20, 5, skinShadow);
+
+    // Sideburns
+    drawPixel(ctx, -11, -15, 4, 12, '#301810');
+
+    // Steely Squinting Gunslinger Eyes
+    drawPixel(ctx, 0, -12, 10, 2, OL);
+    drawPixel(ctx, 0, -10, 9, 3, '#ffffff');
+    drawPixel(ctx, 3, -10, 4, 3, OL);
+    drawPixel(ctx, 4, -10, 2, 2, '#4890d8');
+
+    // Nose & Handlebar Mustache / Goatee
+    drawPixel(ctx, 7, -8, 4, 4, OL);
+    drawPixel(ctx, 6, -7, 4, 3, skinShadow);
+    drawPixel(ctx, -2, -4, 12, 3, '#301810');
+    drawPixel(ctx, 2, 0, 6, 3, '#301810');
+
+    // --- 3. RED BANDANA & DARK CHARCOAL VEST ---
+    drawPixel(ctx, -16, 6, 32, 34, OL);
+    drawPixel(ctx, -14, 8, 28, 30, darkVest);
+
+    // Crimson Silk Wild Rag
+    drawPixel(ctx, -6, 6, 14, 6, '#b02820');
+    drawPixel(ctx, -4, 8, 10, 6, '#c83428');
+    drawPixel(ctx, -2, 10, 4, 4, '#f05040');
+
+    // Vest Details & Silver Watch Chain
+    drawPixel(ctx, -2, 12, 4, 22, '#14141a');
+    drawPixel(ctx, -1, 15, 2, 2, silver);
+    drawPixel(ctx, -1, 21, 2, 2, silver);
+    drawPixel(ctx, -1, 27, 2, 2, silver);
+
+    // Pocket Watch Chain Drape
+    drawPixel(ctx, -10, 24, 2, 2, silver);
+    drawPixel(ctx, -8, 26, 4, 2, silver);
+    drawPixel(ctx, -4, 27, 4, 2, silver);
+    drawPixel(ctx, 0, 26, 2, 2, silver);
+
+    // Tooled Gun Belt & Brass Bullets
+    drawPixel(ctx, -16, 34, 32, 6, '#482010');
+    drawPixel(ctx, -11, 36, 2, 3, '#fce0a0');
+    drawPixel(ctx, -7, 36, 2, 3, '#fce0a0');
+    drawPixel(ctx, -4, 33, 8, 7, silver);
+
+    // --- 4. PANTS & BOOTS ---
+    drawPixel(ctx, -14, 40, 12, 28, OL);
+    drawPixel(ctx, -12, 42, 8, 24, '#1c1c24');
+    drawPixel(ctx, -10, 43, 4, 20, '#2c2c38');
+    drawPixel(ctx, 2, 40, 12, 28, OL);
+    drawPixel(ctx, 4, 42, 8, 24, '#14141a');
+
+    // Black Boots with Silver Rowels
+    drawPixel(ctx, -16, 62, 14, 8, OL);
+    drawPixel(ctx, -14, 64, 10, 6, '#101014');
+    drawPixel(ctx, 2, 62, 14, 8, OL);
+    drawPixel(ctx, 4, 64, 10, 6, '#101014');
+
+    drawPixel(ctx, -17, 64, 4, 4, silver);
+    drawPixel(ctx, -19, 65, 2, 2, '#ffffff');
+
+    // --- 5. EXTENDED LONG-BARREL REVOLVER ---
+    if (drawArmUp) {
+        drawPixel(ctx, 12, 10, 22, 10, OL);
+        drawPixel(ctx, 14, 12, 18, 6, darkVest);
+        drawPixel(ctx, 32, 11, 8, 7, skinBase);
+
+        drawPixel(ctx, 38, 4, 32, 9, OL);
+        drawPixel(ctx, 40, 6, 28, 3, '#d0d0dc');
+        drawPixel(ctx, 40, 5, 26, 1, '#ffffff');
+        drawPixel(ctx, 68, 3, 3, 3, OL);
+        drawPixel(ctx, 38, 7, 8, 5, '#40404c');
+        drawPixel(ctx, 32, 10, 8, 8, '#482010');
+    } else {
+        drawPixel(ctx, 12, 12, 10, 22, OL);
+        drawPixel(ctx, 14, 14, 6, 18, darkVest);
+        drawPixel(ctx, 13, 30, 8, 8, skinBase);
+        drawPixel(ctx, 17, 34, 8, 14, '#381808');
+    }
+
+    ctx.restore();
+}
+
+// --- STANDARD OUTLAW SPRITE (Keeps roster colors for opponents) ---
 function drawHogansCowboy(ctx, x, y, outfit, facingLeft, drawArmUp) {
     const dir = facingLeft ? -1 : 1;
     const bodyColor = outfit.body;
@@ -58,138 +177,75 @@ function drawHogansCowboy(ctx, x, y, outfit, facingLeft, drawArmUp) {
     const accentColor = outfit.accent;
     const skinBase = '#fcb070';
     const skinShadow = '#c86e38';
-    const skinHighlight = '#ffcca0';
     const OL = snesPalette.outline;
 
     ctx.save();
     ctx.translate(Math.floor(x), Math.floor(y));
 
-    // Ground Shadow (Layered contact shadow)
     drawPixel(ctx, -24, 70, 48, 6, 'rgba(0, 0, 0, 0.45)');
-    drawPixel(ctx, -18, 71, 36, 4, 'rgba(0, 0, 0, 0.35)');
 
-    // --- HAT (Curved 16-bit Brim with Dual Pinch Crown) ---
-    // Brim Outer Outline & Trim
+    // Hat
     drawPixel(ctx, -30, -22, 60, 4, OL);
     drawPixel(ctx, -28, -20, 56, 3, hatColor);
-    drawPixel(ctx, -26, -19, 52, 1, '#ffeedd'); // Brim edge specular glint
-    drawPixel(ctx, -32, -25, 3, 4, OL);        // Curved upward left tip
-    drawPixel(ctx, 29, -25, 3, 4, OL);         // Curved upward right tip
-
-    // Crown Body & Side Creases
     drawPixel(ctx, -16, -40, 32, 20, OL);
     drawPixel(ctx, -14, -38, 28, 18, hatColor);
-    drawPixel(ctx, -6, -40, 12, 4, OL);        // Crown top valley
-    drawPixel(ctx, -4, -38, 8, 3, '#1a1018');  // Deep shadow in crease
-    drawPixel(ctx, -14, -34, 4, 12, 'rgba(0, 0, 0, 0.25)'); // Side shadow
+    drawPixel(ctx, -6, -40, 12, 4, OL);
 
-    // Patterned Bandana Hatband
+    // Bandana Hatband
     drawPixel(ctx, -14, -24, 28, 4, accentColor);
-    drawPixel(ctx, -14, -22, 28, 1, '#ffffff'); // Silk highlight weave
-    drawPixel(ctx, -14, -21, 28, 1, OL);
 
-    // --- HEAD, HAIR & FACIAL FEATURES ---
+    // Head
     drawPixel(ctx, -12, -17, 24, 23, OL);
     drawPixel(ctx, -10, -15, 20, 19, skinBase);
-    drawPixel(ctx, -10, -3, 20, 5, skinShadow); // Jaw and chin ambient shadow
+    drawPixel(ctx, -10, -3, 20, 5, skinShadow);
 
-    // Hair / Sideburns
-    drawPixel(ctx, -dir * 11, -15, 4, 12, '#381c0c');
-
-    // Expressive Eyes (Brows, sclera, iris, pupil glint)
     const eyeX = dir * 4;
-    drawPixel(ctx, eyeX - 5, -13, 9, 2, OL);            // Forehead brow line
-    drawPixel(ctx, eyeX - 5, -10, 8, 4, '#ffffff');      // Eye white
-    drawPixel(ctx, eyeX - 3, -10, 5, 4, OL);             // Iris ring
-    drawPixel(ctx, eyeX - 2, -10, 2, 2, '#3880d8');      // Blue pupil
-    drawPixel(ctx, eyeX - 1, -10, 1, 1, '#ffffff');      // Specular glint
+    drawPixel(ctx, eyeX - 5, -13, 9, 2, OL);
+    drawPixel(ctx, eyeX - 5, -10, 8, 4, '#ffffff');
+    drawPixel(ctx, eyeX - 3, -10, 5, 4, OL);
+    drawPixel(ctx, eyeX - 9, -4, 18, 4, '#381c0c');
 
-    // Nose & Handlebar Mustache
-    drawPixel(ctx, eyeX - 1, -6, 3, 2, skinShadow);     // Nose bridge
-    drawPixel(ctx, eyeX - 9, -4, 18, 4, '#381c0c');     // Thick mustache body
-    drawPixel(ctx, eyeX - 11, -2, 3, 3, '#381c0c');     // Curled left tip
-    drawPixel(ctx, eyeX + 8, -2, 3, 3, '#381c0c');      // Curled right tip
-
-    // Silk Bandana / Scarf
+    // Scarf / Neckwear
     drawPixel(ctx, -8, 6, 16, 8, accentColor);
-    drawPixel(ctx, -4, 9, 8, 8, accentColor);
-    drawPixel(ctx, -2, 11, 4, 6, '#ffffff');            // Scarf highlight
-    drawPixel(ctx, -8, 6, 16, 1, 'rgba(0, 0, 0, 0.3)');
 
-    // --- VEST & SHIRT (Multi-tone shading) ---
+    // Torso
     drawPixel(ctx, -16, 6, 32, 34, OL);
     drawPixel(ctx, -14, 8, 28, 30, bodyColor);
-
-    // Shirt Placket & Buttons
     drawPixel(ctx, -2, 10, 4, 24, '#f8f4ec');
-    drawPixel(ctx, -1, 14, 2, 2, '#381c0c');
-    drawPixel(ctx, -1, 20, 2, 2, '#381c0c');
-    drawPixel(ctx, -1, 26, 2, 2, '#381c0c');
-
-    // Vest Creases & Edge Shading
-    drawPixel(ctx, -14, 8, 3, 30, 'rgba(0, 0, 0, 0.25)');
-    drawPixel(ctx, 11, 8, 3, 30, 'rgba(0, 0, 0, 0.25)');
-    drawPixel(ctx, -10, 28, 6, 4, 'rgba(0, 0, 0, 0.2)'); // Vest pocket left
-    drawPixel(ctx, 4, 28, 6, 4, 'rgba(0, 0, 0, 0.2)');  // Vest pocket right
-
-    // Gun Belt, Brass Cartridges, & Buckle
     drawPixel(ctx, -16, 34, 32, 6, '#381808');
-    drawPixel(ctx, -16, 34, 32, 1, '#582810');          // Belt highlight
-    drawPixel(ctx, -11, 36, 2, 3, '#fce0a0');           // Bullet 1
-    drawPixel(ctx, -7, 36, 2, 3, '#fce0a0');            // Bullet 2
-    drawPixel(ctx, 5, 36, 2, 3, '#fce0a0');             // Bullet 3
-    drawPixel(ctx, 9, 36, 2, 3, '#fce0a0');             // Bullet 4
-    drawPixel(ctx, -4, 33, 8, 7, '#fce0a0');            // Buckle outer
-    drawPixel(ctx, -2, 35, 4, 3, '#381808');            // Buckle prong
+    drawPixel(ctx, -4, 33, 8, 7, '#fce0a0');
 
-    // --- LEGS & BLUE JEANS ---
+    // Legs
     drawPixel(ctx, -14, 40, 12, 28, OL);
-    drawPixel(ctx, -12, 42, 8, 24, '#1c345c');          // Denim base
-    drawPixel(ctx, -11, 43, 4, 20, '#30548c');          // Denim thigh highlight
+    drawPixel(ctx, -12, 42, 8, 24, '#1c345c');
     drawPixel(ctx, 2, 40, 12, 28, OL);
     drawPixel(ctx, 4, 42, 8, 24, '#10223e');
 
-    // Leather Boots & Spurs
     drawPixel(ctx, -16, 62, 14, 8, OL);
     drawPixel(ctx, -14, 64, 10, 6, '#381808');
-    drawPixel(ctx, -14, 64, 10, 2, '#582810');          // Boot toe shine
     drawPixel(ctx, 2, 62, 14, 8, OL);
     drawPixel(ctx, 4, 64, 10, 6, '#381808');
-    drawPixel(ctx, 4, 64, 10, 2, '#582810');
 
-    // Boot Spurs
-    drawPixel(ctx, -dir * 17, 64, 4, 4, '#fce0a0');
-    drawPixel(ctx, -dir * 19, 65, 2, 2, '#ffffff');
-
-    // --- ARMS & REVOLVER ---
+    // Arm & Standard Revolver
     if (drawArmUp) {
-        // Extended Arm
         drawPixel(ctx, dir * 12, 10, 22 * dir, 10, OL);
         drawPixel(ctx, dir * 14, 12, 18 * dir, 6, bodyColor);
-        drawPixel(ctx, dir * 14, 12, 18 * dir, 2, '#ffeedd'); // Sleeve highlight
         drawPixel(ctx, dir * 32, 11, 8 * dir, 7, skinBase);
 
-        // Peacemaker Revolver
         drawPixel(ctx, dir * 38, 4, 22 * dir, 9, OL);
-        drawPixel(ctx, dir * 40, 6, 18 * dir, 3, '#d0d0d8');  // Barrel steel
-        drawPixel(ctx, dir * 40, 5, 16 * dir, 1, '#ffffff');  // Chrome specular line
-        drawPixel(ctx, dir * 58, 4, 2 * dir, 2, OL);         // Front iron sight
-        drawPixel(ctx, dir * 38, 7, 7 * dir, 5, '#5c5c68');  // Revolver cylinder
-        drawPixel(ctx, dir * 33, 10, 7 * dir, 8, '#582410'); // Walnut grip
-        drawPixel(ctx, dir * 34, 3, 2 * dir, 4, OL);         // Cocked hammer
+        drawPixel(ctx, dir * 40, 6, 18 * dir, 3, '#d0d0d8');
+        drawPixel(ctx, dir * 38, 7, 7 * dir, 5, '#5c5c68');
+        drawPixel(ctx, dir * 33, 10, 7 * dir, 8, '#582410');
     } else {
-        // Holstered Arm
         drawPixel(ctx, dir * 12, 12, 10 * dir, 22, OL);
         drawPixel(ctx, dir * 14, 14, 6 * dir, 18, bodyColor);
-        drawPixel(ctx, dir * 13, 30, 8 * dir, 8, skinBase);  // Hand on holster
-        drawPixel(ctx, dir * 17, 36, 7 * dir, 12, '#281008'); // Leather holster
-        drawPixel(ctx, dir * 18, 38, 5 * dir, 2, '#fce0a0'); // Holster brass stud
+        drawPixel(ctx, dir * 13, 30, 8 * dir, 8, skinBase);
     }
 
     ctx.restore();
 }
 
-// 16-Bit Fallen Cowboy Sprite
+// 16-Bit Fallen Sprite
 function drawHogansFallenCowboy(ctx, x, y, outfit, facingLeft, progress) {
     const dir = facingLeft ? -1 : 1;
     const fallDir = facingLeft ? 1 : -1;
@@ -219,17 +275,13 @@ function drawHogansFallenCowboy(ctx, x, y, outfit, facingLeft, progress) {
         bodyY = y + 20;
     }
 
-    // Shadow
     drawPixel(ctx, bodyX - 26, y + 68, 52, 6, 'rgba(0, 0, 0, 0.45)');
 
-    // Flying Hat Arc
     const hatX = x + fall * 36 * fallDir;
     const hatY = y - 20 - Math.sin(fall * Math.PI) * 24 + fall * 86;
     drawPixel(ctx, hatX - 14, hatY, 28, 8, OL);
     drawPixel(ctx, hatX - 12, hatY + 2, 24, 4, hatColor);
-    drawPixel(ctx, hatX - 10, hatY + 1, 20, 1, '#ffffff');
 
-    // Dropped Revolver
     const gunX = x + fall * 30 * fallDir;
     const gunY = y + 36 + fall * 32;
     drawPixel(ctx, gunX, gunY, 14 * dir, 6, OL);
@@ -249,18 +301,14 @@ function drawHogansFallenCowboy(ctx, x, y, outfit, facingLeft, progress) {
         drawPixel(ctx, -12, 8, 16, 16, skinColor);
     } else {
         const headX = fallDir * 18;
-        // Boots & Legs on side
         drawPixel(ctx, -headX - 8, 42, 16, 10, OL);
         drawPixel(ctx, -headX - 6, 44, 12, 6, '#381808');
         drawPixel(ctx, -headX + 2, 38, 22, 12, OL);
         drawPixel(ctx, -headX + 4, 40, 18, 8, '#1c345c');
 
-        // Torso on side
         drawPixel(ctx, -16, 26, 32, 20, OL);
         drawPixel(ctx, -14, 28, 28, 16, bodyColor);
-        drawPixel(ctx, -14, 28, 28, 2, 'rgba(0,0,0,0.25)');
 
-        // Head on dirt
         drawPixel(ctx, headX - 10, 20, 18, 18, OL);
         drawPixel(ctx, headX - 8, 22, 14, 14, skinColor);
         drawPixel(ctx, headX - 6, 28, 10, 4, '#381c0c');
@@ -269,28 +317,18 @@ function drawHogansFallenCowboy(ctx, x, y, outfit, facingLeft, progress) {
     ctx.restore();
 }
 
-// 16-Bit Town Scenery (Detailed brickwork, clapboards, signs, awnings, horse, & boardwalk)
+// 5-Building Western Streetscape
 function renderHogansBackground(ctx, width, height, tension, progress) {
     const skySplit = Math.floor(height * 0.52);
 
-    // Multi-Tone 16-Bit Sunset Sky Gradient
-    drawPixel(ctx, 0, 0, width, skySplit * 0.25, snesPalette.skyTop);
-    drawPixel(ctx, 0, skySplit * 0.25, width, skySplit * 0.20, snesPalette.skyUpper);
-    drawPixel(ctx, 0, skySplit * 0.45, width, skySplit * 0.18, snesPalette.skyMid);
-    drawPixel(ctx, 0, skySplit * 0.63, width, skySplit * 0.17, snesPalette.skyWarm);
-    drawPixel(ctx, 0, skySplit * 0.80, width, skySplit * 0.12, snesPalette.skyHorizon);
-    drawPixel(ctx, 0, skySplit * 0.92, width, skySplit * 0.08, snesPalette.skyGlow);
-
-    // Distant Desert Mesas
-    const mesaY = skySplit - 68;
-    drawPixel(ctx, 20, mesaY + 16, 120, 48, snesPalette.mesaDark);
-    drawPixel(ctx, 35, mesaY + 6, 90, 14, snesPalette.mesaLight);
-    drawPixel(ctx, width - 210, mesaY + 22, 150, 42, snesPalette.mesaDark);
-    drawPixel(ctx, width - 180, mesaY + 8, 90, 16, snesPalette.mesaLight);
+    drawPixel(ctx, 0, 0, width, skySplit * 0.30, snesPalette.skyTop);
+    drawPixel(ctx, 0, skySplit * 0.30, width, skySplit * 0.25, snesPalette.skyUpper);
+    drawPixel(ctx, 0, skySplit * 0.55, width, skySplit * 0.22, snesPalette.skyMid);
+    drawPixel(ctx, 0, skySplit * 0.77, width, skySplit * 0.23, snesPalette.skyHorizon);
 
     const groundY = skySplit - 6;
 
-    // --- 1. SALOON (Far Left - 2-Story Brick) ---
+    // --- 1. SALOON ---
     const saloonX = 4;
     const saloonW = 160;
     const saloonH = 146;
@@ -299,18 +337,13 @@ function renderHogansBackground(ctx, width, height, tension, progress) {
     drawPixel(ctx, saloonX, saloonY, saloonW, saloonH, snesPalette.outline);
     drawPixel(ctx, saloonX + 2, saloonY + 2, saloonW - 4, saloonH - 4, '#7c2814');
 
-    // 16-Bit Brick Courses
-    for (let row = saloonY + 4; row < groundY + 6; row += 6) {
-        drawPixel(ctx, saloonX + 4, row, saloonW - 8, 1, '#4e1408');
-        drawPixel(ctx, saloonX + 4, row + 1, saloonW - 8, 1, '#943820');
+    for (let row = saloonY + 4; row < groundY + 6; row += 8) {
+        drawPixel(ctx, saloonX + 4, row, saloonW - 8, 1, '#581c0e');
     }
 
-    // Parapet Cornice
     drawPixel(ctx, saloonX + 10, saloonY - 14, saloonW - 20, 14, snesPalette.outline);
     drawPixel(ctx, saloonX + 12, saloonY - 12, saloonW - 24, 10, '#44140a');
-    drawPixel(ctx, saloonX + 12, saloonY - 12, saloonW - 24, 2, '#943820');
 
-    // Signboard
     const sSignX = saloonX + 15;
     const sSignY = saloonY + 8;
     const sSignW = 130;
@@ -325,16 +358,13 @@ function renderHogansBackground(ctx, width, height, tension, progress) {
     ctx.textAlign = 'center';
     ctx.fillText("SALOON", sSignX + sSignW / 2, sSignY + 14);
 
-    // Windows & Curtains
     [saloonX + 14, saloonX + 112].forEach((winX) => {
         drawPixel(ctx, winX - 2, saloonY + 36, 32, 26, snesPalette.outline);
         drawPixel(ctx, winX, saloonY + 38, 28, 22, '#100c14');
         drawPixel(ctx, winX + 2, saloonY + 40, 6, 18, '#a82c18');
         drawPixel(ctx, winX + 20, saloonY + 40, 6, 18, '#a82c18');
-        drawPixel(ctx, winX + 13, saloonY + 38, 2, 22, '#4e1408');
     });
 
-    // Porch & Batwing Doors
     drawPixel(ctx, saloonX - 2, saloonY + 76, saloonW + 4, 8, snesPalette.outline);
     drawPixel(ctx, saloonX, saloonY + 78, saloonW, 4, '#582410');
     drawPixel(ctx, saloonX + 6, saloonY + 84, 6, 52, snesPalette.outline);
@@ -346,7 +376,7 @@ function renderHogansBackground(ctx, width, height, tension, progress) {
     drawPixel(ctx, sDoorX, sDoorY + 6, 15, 28, '#884414');
     drawPixel(ctx, sDoorX + 17, sDoorY + 6, 15, 28, '#884414');
 
-    // --- 2. SHERIFF'S OFFICE & JAIL (Left-Center - Dark Timber) ---
+    // --- 2. SHERIFF'S OFFICE ---
     const sheriffX = 170;
     const sheriffW = 145;
     const sheriffH = 110;
@@ -355,9 +385,8 @@ function renderHogansBackground(ctx, width, height, tension, progress) {
     drawPixel(ctx, sheriffX, sheriffY, sheriffW, sheriffH, snesPalette.outline);
     drawPixel(ctx, sheriffX + 2, sheriffY + 2, sheriffW - 4, sheriffH - 4, '#5c3822');
 
-    for (let row = sheriffY + 4; row < groundY + 6; row += 6) {
+    for (let row = sheriffY + 4; row < groundY + 6; row += 7) {
         drawPixel(ctx, sheriffX + 2, row, sheriffW - 4, 1, '#3a2012');
-        drawPixel(ctx, sheriffX + 2, row + 1, sheriffW - 4, 1, '#78482c');
     }
 
     drawPixel(ctx, sheriffX - 2, sheriffY - 8, sheriffW + 4, 8, snesPalette.outline);
@@ -371,7 +400,6 @@ function renderHogansBackground(ctx, width, height, tension, progress) {
     drawPixel(ctx, shSignX, shSignY, shSignW, shSignH, '#201408');
     drawPixel(ctx, shSignX + 2, shSignY + 2, shSignW - 4, shSignH - 4, '#a87848');
 
-    // Gold Star Badge
     const starX = shSignX + 10;
     const starY = shSignY + 8;
     drawPixel(ctx, starX - 3, starY - 3, 6, 6, '#fce0a0');
@@ -380,7 +408,6 @@ function renderHogansBackground(ctx, width, height, tension, progress) {
     ctx.font = '9px "Press Start 2P", monospace';
     ctx.fillText("SHERIFF", shSignX + 68, shSignY + 12);
 
-    // Barred Jail Cell Window
     const jailWinX = sheriffX + 12;
     const jailWinY = sheriffY + 30;
     drawPixel(ctx, jailWinX - 2, jailWinY - 2, 30, 26, snesPalette.outline);
@@ -391,21 +418,7 @@ function renderHogansBackground(ctx, width, height, tension, progress) {
     drawPixel(ctx, jailWinX + 14, jailWinY, 2, 22, '#888888');
     drawPixel(ctx, jailWinX + 22, jailWinY, 2, 22, '#888888');
 
-    // Office Window & Sturdy Door
-    const offWinX = sheriffX + 102;
-    const offWinY = sheriffY + 30;
-    drawPixel(ctx, offWinX - 2, offWinY - 2, 30, 26, snesPalette.outline);
-    drawPixel(ctx, offWinX, offWinY, 26, 22, '#181014');
-    drawPixel(ctx, offWinX + 2, offWinY + 2, 5, 18, '#4878a8');
-    drawPixel(ctx, offWinX + 19, offWinY + 2, 5, 18, '#4878a8');
-
-    const shDoorX = sheriffX + 54;
-    const shDoorY = sheriffY + 40;
-    drawPixel(ctx, shDoorX - 2, shDoorY - 2, 34, 58, snesPalette.outline);
-    drawPixel(ctx, shDoorX, shDoorY, 30, 56, '#3a1e0c');
-    drawPixel(ctx, shDoorX + 22, shDoorY + 26, 4, 4, '#fce0a0');
-
-    // --- 3. THE BANK (Center - Stone Masonry) ---
+    // --- 3. THE BANK ---
     const bankX = 320;
     const bankW = 150;
     const bankH = 135;
@@ -414,13 +427,11 @@ function renderHogansBackground(ctx, width, height, tension, progress) {
     drawPixel(ctx, bankX, bankY, bankW, bankH, snesPalette.outline);
     drawPixel(ctx, bankX + 2, bankY + 2, bankW - 4, bankH - 4, '#7c8088');
 
-    // Ashlar Stone Blocks
-    for (let r = bankY + 6; r < groundY + 6; r += 10) {
-        drawPixel(ctx, bankX + 2, r, bankW - 4, 1, '#4e525a');
-        drawPixel(ctx, bankX + 2, r + 1, bankW - 4, 1, '#9ea2aa');
+    for (let r = bankY + 6; r < groundY + 6; r += 12) {
+        drawPixel(ctx, bankX + 2, r, bankW - 4, 1, '#50545c');
     }
     for (let c = bankX + 18; c < bankX + bankW; c += 28) {
-        drawPixel(ctx, c, bankY + 2, 1, bankH - 4, '#4e525a');
+        drawPixel(ctx, c, bankY + 2, 1, bankH - 4, '#50545c');
     }
 
     drawPixel(ctx, bankX - 4, bankY - 14, bankW + 8, 14, snesPalette.outline);
@@ -438,7 +449,7 @@ function renderHogansBackground(ctx, width, height, tension, progress) {
     ctx.font = '10px "Press Start 2P", monospace';
     ctx.fillText("BANK", bSignX + bSignW / 2, bSignY + 13);
 
-    // Bank Barred Windows & Iron Doors
+    // Bank Doors & Barred Windows
     drawPixel(ctx, bankX + 8, bankY + 32, 28, 30, snesPalette.outline);
     drawPixel(ctx, bankX + 10, bankY + 34, 24, 26, '#181c20');
     drawPixel(ctx, bankX + 16, bankY + 34, 2, 26, '#888888');
@@ -454,10 +465,8 @@ function renderHogansBackground(ctx, width, height, tension, progress) {
     drawPixel(ctx, bDoorX - 2, bDoorY - 2, 42, 64, snesPalette.outline);
     drawPixel(ctx, bDoorX, bDoorY, 38, 62, '#282c34');
     drawPixel(ctx, bDoorX + 17, bDoorY, 4, 62, '#181c20');
-    drawPixel(ctx, bDoorX + 12, bDoorY + 28, 3, 6, '#fce0a0');
-    drawPixel(ctx, bDoorX + 23, bDoorY + 28, 3, 6, '#fce0a0');
 
-    // --- 4. GENERAL STORE (Right-Center - Striped Awning & Crates) ---
+    // --- 4. GENERAL STORE ---
     const storeX = 476;
     const storeW = 155;
     const storeH = 120;
@@ -466,7 +475,7 @@ function renderHogansBackground(ctx, width, height, tension, progress) {
     drawPixel(ctx, storeX, storeY, storeW, storeH, snesPalette.outline);
     drawPixel(ctx, storeX + 2, storeY + 2, storeW - 4, storeH - 4, '#8a5c36');
 
-    for (let row = storeY + 4; row < groundY + 6; row += 5) {
+    for (let row = storeY + 4; row < groundY + 6; row += 6) {
         drawPixel(ctx, storeX + 2, row, storeW - 4, 1, '#5e3e24');
     }
 
@@ -476,38 +485,25 @@ function renderHogansBackground(ctx, width, height, tension, progress) {
     const gsSignH = 16;
     drawPixel(ctx, gsSignX - 2, gsSignY - 2, gsSignW + 4, gsSignH + 4, snesPalette.outline);
     drawPixel(ctx, gsSignX, gsSignY, gsSignW, gsSignH, '#201408');
-    drawPixel(ctx, gsSignX + 2, gsSignY + 2, gsSignW - 4, shSignH - 4, '#e4d0a0');
+    drawPixel(ctx, gsSignX + 2, gsSignY + 2, gsSignW - 4, gsSignH - 4, '#e4d0a0');
 
     ctx.fillStyle = '#201408';
     ctx.font = '8px "Press Start 2P", monospace';
     ctx.fillText("GENERAL STORE", gsSignX + gsSignW / 2, gsSignY + 12);
 
-    // Striped Awning
     const awnY = storeY + 26;
     drawPixel(ctx, storeX - 4, awnY - 2, storeW + 8, 16, snesPalette.outline);
     for (let stripe = storeX - 2; stripe < storeX + storeW + 4; stripe += 12) {
         drawPixel(ctx, stripe, awnY, 6, 12, '#a82c18');
-        drawPixel(ctx, stripe, awnY, 6, 2, '#d8442c');
         drawPixel(ctx, stripe + 6, awnY, 6, 12, '#fcfcfc');
-        drawPixel(ctx, stripe + 6, awnY, 6, 2, '#ffffff');
     }
 
-    // Windows, Store Door, and Wooden Barrels
     drawPixel(ctx, storeX + 12, storeY + 48, 38, 30, snesPalette.outline);
     drawPixel(ctx, storeX + 14, storeY + 50, 34, 26, '#181014');
     drawPixel(ctx, storeX + 105, storeY + 48, 38, 30, snesPalette.outline);
     drawPixel(ctx, storeX + 107, storeY + 50, 34, 26, '#181014');
 
-    const gsDoorX = storeX + 58;
-    const gsDoorY = storeY + 48;
-    drawPixel(ctx, gsDoorX - 2, gsDoorY - 2, 38, 56, snesPalette.outline);
-    drawPixel(ctx, gsDoorX, gsDoorY, 34, 54, '#442814');
-
-    drawPixel(ctx, storeX + 8, groundY - 20, 14, 18, snesPalette.outline);
-    drawPixel(ctx, storeX + 10, groundY - 18, 10, 14, '#6c4424');
-    drawPixel(ctx, storeX + 8, groundY - 14, 14, 2, '#201008');
-
-    // --- 5. HOTEL (Far Right - 2-Story Clapboard) ---
+    // --- 5. HOTEL ---
     const hotelX = width - 176;
     const hotelW = 170;
     const hotelH = 154;
@@ -516,9 +512,8 @@ function renderHogansBackground(ctx, width, height, tension, progress) {
     drawPixel(ctx, hotelX, hotelY, hotelW, hotelH, snesPalette.outline);
     drawPixel(ctx, hotelX + 2, hotelY + 2, hotelW - 4, hotelH - 4, '#a87848');
 
-    for (let row = hotelY + 4; row < groundY + 6; row += 5) {
+    for (let row = hotelY + 4; row < groundY + 6; row += 6) {
         drawPixel(ctx, hotelX + 2, row, hotelW - 4, 1, '#78502c');
-        drawPixel(ctx, hotelX + 2, row + 1, hotelW - 4, 1, '#c49058');
     }
 
     drawPixel(ctx, hotelX - 4, hotelY - 12, hotelW + 8, 12, snesPalette.outline);
@@ -534,9 +529,9 @@ function renderHogansBackground(ctx, width, height, tension, progress) {
 
     ctx.fillStyle = '#201008';
     ctx.font = '10px "Press Start 2P", monospace';
+    ctx.textAlign = 'center';
     ctx.fillText("HOTEL", hSignX + hSignW / 2, hSignY + 14);
 
-    // Balcony Railing & Entrance
     [hotelX + 12, hotelX + 68, hotelX + 124].forEach((winX) => {
         drawPixel(ctx, winX - 2, hotelY + 36, 30, 26, snesPalette.outline);
         drawPixel(ctx, winX, hotelY + 38, 26, 22, '#181014');
@@ -546,61 +541,50 @@ function renderHogansBackground(ctx, width, height, tension, progress) {
 
     drawPixel(ctx, hotelX - 4, hotelY + 74, hotelW + 8, 6, snesPalette.outline);
     drawPixel(ctx, hotelX - 2, hotelY + 76, hotelW + 4, 3, '#d89c58');
-    for (let post = hotelX; post < hotelX + hotelW; post += 10) {
+    for (let post = hotelX; post < hotelX + hotelW; post += 12) {
         drawPixel(ctx, post, hotelY + 66, 2, 8, '#381808');
     }
 
     drawPixel(ctx, hotelX + 64, hotelY + 88, 42, 50, snesPalette.outline);
     drawPixel(ctx, hotelX + 66, hotelY + 90, 38, 48, '#482010');
 
-    // --- 6. HITCHING POST & 16-BIT HORSE (Front of Bank / Sheriff) ---
+    // --- 6. HITCHING POST & HORSE ---
     drawPixel(ctx, 240, groundY - 14, 90, 24, snesPalette.outline);
     drawPixel(ctx, 242, groundY - 12, 86, 4, '#88481c');
     drawPixel(ctx, 246, groundY - 8, 6, 18, '#582c0e');
     drawPixel(ctx, 320, groundY - 8, 6, 18, '#582c0e');
 
-    // 16-Bit Horse Sprite
     const horseX = 258;
     const horseY = groundY - 38;
 
     drawPixel(ctx, horseX, horseY, 48, 32, snesPalette.outline);
     drawPixel(ctx, horseX + 2, horseY + 2, 44, 28, '#582810');
-    drawPixel(ctx, horseX + 6, horseY + 4, 32, 14, '#7a381c'); // Muscle highlight
+    drawPixel(ctx, horseX + 8, horseY + 6, 30, 16, '#703418');
 
     drawPixel(ctx, horseX + 36, horseY - 14, 14, 26, snesPalette.outline);
     drawPixel(ctx, horseX + 38, horseY - 12, 10, 22, '#582810');
     drawPixel(ctx, horseX + 44, horseY - 18, 12, 14, snesPalette.outline);
     drawPixel(ctx, horseX + 46, horseY - 16, 8, 10, '#441c08');
-    drawPixel(ctx, horseX + 48, horseY - 14, 2, 2, '#ffffff'); // Eye glint
+    drawPixel(ctx, horseX + 48, horseY - 14, 2, 2, '#ffffff');
     drawPixel(ctx, horseX + 40, horseY - 20, 4, 6, '#582810');
 
-    drawPixel(ctx, horseX + 34, horseY - 14, 4, 18, '#180804'); // Dark mane
-    drawPixel(ctx, horseX - 4, horseY + 4, 6, 24, '#180804');   // Tail
-    drawPixel(ctx, horseX + 44, horseY - 12, 2, 12, '#fce0a0'); // Bridle
-
-    drawPixel(ctx, horseX + 16, horseY - 2, 18, 14, '#2c1408'); // Saddle
-    drawPixel(ctx, horseX + 18, horseY + 12, 2, 12, '#fce0a0'); // Stirrup strap
-    drawPixel(ctx, horseX + 16, horseY + 24, 6, 2, '#ffffff');  // Steel stirrup
+    drawPixel(ctx, horseX + 34, horseY - 14, 4, 18, '#180804');
+    drawPixel(ctx, horseX - 4, horseY + 4, 6, 24, '#180804');
+    drawPixel(ctx, horseX + 44, horseY - 12, 2, 12, '#fce0a0');
 
     drawPixel(ctx, horseX + 4, horseY + 30, 6, 14, snesPalette.outline);
-    drawPixel(ctx, horseX + 6, horseY + 30, 4, 12, '#441c08');
-    drawPixel(ctx, horseX + 4, horseY + 40, 6, 4, '#0c0604'); // Hoof
-
     drawPixel(ctx, horseX + 34, horseY + 30, 6, 14, snesPalette.outline);
-    drawPixel(ctx, horseX + 36, horseY + 30, 4, 12, '#441c08');
-    drawPixel(ctx, horseX + 34, horseY + 40, 6, 4, '#0c0604');
 
     // --- 7. BOARDWALK & STREET RUTS ---
     drawPixel(ctx, 0, groundY - 2, width, 6, snesPalette.outline);
     drawPixel(ctx, 0, groundY, width, 3, snesPalette.boardwalk);
-    drawPixel(ctx, 0, groundY + 1, width, 1, snesPalette.boardwalkPlank);
 
     drawPixel(ctx, 0, groundY + 3, width, height - (groundY + 3), snesPalette.streetDirt);
     drawPixel(ctx, 0, groundY + 24, width, 6, snesPalette.streetRut);
     drawPixel(ctx, 0, groundY + 54, width, 10, snesPalette.streetDeep);
 }
 
-// 16-Bit Wanted Poster (Parchment frame & mugshot)
+// Wanted Poster Screen
 function drawWantedPoster(ctx, width, height, outlaw) {
     const cardW = 320;
     const cardH = 340;
@@ -668,14 +652,14 @@ export function createRenderer(canvas) {
             const opponentX = width * 0.74;
             const cowboyY = height * 0.40;
 
-            // Player Render
+            // Player Render (Custom Lee Van Cleef Sprite)
             if (state.playerDeathProgress > 0) {
-                drawHogansFallenCowboy(context, playerX, cowboyY, state.playerOutfit, false, state.playerDeathProgress);
+                drawHogansFallenCowboy(context, playerX, cowboyY, { hat: '#18181c', body: '#2c2c34' }, false, state.playerDeathProgress);
             } else {
-                drawHogansCowboy(context, playerX, cowboyY, state.playerOutfit, false, state.playerHasDrawn);
+                drawHeroVanCleef(context, playerX, cowboyY, state.playerHasDrawn);
             }
 
-            // Opponent Render
+            // Opponent Render (Standard Outlaw Sprite with Outfit Roster Colors)
             if (state.opponentDeathProgress > 0) {
                 drawHogansFallenCowboy(context, opponentX, cowboyY, state.opponentOutfit, true, state.opponentDeathProgress);
             } else {
