@@ -1,4 +1,4 @@
-// render.js - Midnight Spur (Cinematic Responsive Framing Edition)
+// render.js - Midnight Spur (Cinematic Responsive Framing + Tumbleweed Edition)
 
 const snesPalette = {
     skyTop: '#0a0d1a',
@@ -72,6 +72,37 @@ function drawMuzzleBlast(ctx, x, y, facingLeft, flashFrame) {
     ctx.restore();
 }
 
+// Rolling 8-Bit Pixel Tumbleweed
+function drawTumbleweed(ctx, tw) {
+    if (!tw || !tw.active) return;
+
+    ctx.save();
+    const drawY = tw.currentY !== undefined ? tw.currentY : tw.y;
+    ctx.translate(Math.floor(tw.x), Math.floor(drawY));
+    ctx.rotate(tw.rotation || 0);
+
+    // Ground Shadow
+    drawPixel(ctx, -7, 10, 14, 3, 'rgba(0, 0, 0, 0.25)');
+
+    const strawDark = '#6e4822';
+    const strawMid = '#a4743c';
+    const strawLight = '#d49c58';
+
+    drawPixel(ctx, -8, -8, 16, 16, strawDark);
+    drawPixel(ctx, -6, -6, 12, 12, strawMid);
+    drawPixel(ctx, -4, -4, 8, 8, strawLight);
+
+    drawPixel(ctx, -10, -2, 3, 4, strawDark);
+    drawPixel(ctx, 7, -2, 3, 4, strawDark);
+    drawPixel(ctx, -2, -10, 4, 3, strawDark);
+    drawPixel(ctx, -2, 7, 4, 3, strawDark);
+
+    drawPixel(ctx, -6, 2, 4, 2, strawMid);
+    drawPixel(ctx, 2, -6, 2, 4, strawLight);
+
+    ctx.restore();
+}
+
 // --- UNIQUE HERO SPRITE: High-Contrast Pale Stetson & Black Duster ---
 function drawHeroVanCleef(ctx, x, y, drawArmUp) {
     const skinBase = '#f4b884';
@@ -86,7 +117,6 @@ function drawHeroVanCleef(ctx, x, y, drawArmUp) {
     ctx.save();
     ctx.translate(Math.floor(x), Math.floor(y));
 
-    // Ground Shadow
     drawPixel(ctx, -24, 70, 48, 6, 'rgba(0, 0, 0, 0.45)');
 
     // 1. Hat
@@ -762,14 +792,11 @@ export function createRenderer(canvas) {
             }
 
             // --- CINEMATIC DYNAMIC FRAMING ON MOBILE ---
-            // If canvas width is under 520px (e.g., narrow mobile portrait viewport),
-            // zoom into the standoff center so character details stay big and sharp.
             const isNarrowMobile = typeof window !== 'undefined' && window.innerWidth < 520;
             const zoomScale = isNarrowMobile ? 1.8 : 1.0;
 
             context.save();
             if (isNarrowMobile) {
-                // Focus camera directly on the standoff zone
                 const focalX = width * 0.50;
                 const focalY = height * 0.40;
                 context.translate(focalX, focalY);
@@ -779,7 +806,11 @@ export function createRenderer(canvas) {
 
             renderHogansBackground(context, width, height, state.tension, state.progress);
 
-            // Standoff positions (tucked closer on mobile zoom)
+            // Tumbleweed
+            if (state.tumbleweed && state.tumbleweed.active) {
+                drawTumbleweed(context, state.tumbleweed);
+            }
+
             const playerX = isNarrowMobile ? width * 0.28 : width * 0.26;
             const opponentX = isNarrowMobile ? width * 0.72 : width * 0.74;
             const cowboyY = height * 0.40;
@@ -810,9 +841,9 @@ export function createRenderer(canvas) {
                 }
             }
 
-            context.restore(); // Exit zoom transform for HUD elements
+            context.restore(); // Exit zoom transform
 
-            // Non-scaled HUD overlays for crisp UI text
+            // HUD overlays
             drawTimerMeter(context, width, state.countdownProgress);
 
             context.fillStyle = '#fce0a0';
