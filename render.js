@@ -34,78 +34,128 @@ function drawTimerMeter(ctx, width, progress) {
     }
 }
 
-// Draw Authentic Hogan's Alley Style Cowboy Sprite
+// High-Detail (2x Pixel Grid) Cowboy Sprite
 function drawHogansCowboy(ctx, x, y, outfit, facingLeft, drawArmUp) {
     const dir = facingLeft ? -1 : 1;
     const bodyColor = outfit.body;
     const hatColor = outfit.hat;
     const accentColor = outfit.accent;
     const skinColor = '#fcb070';
-    const gunColor = '#fcfcfc'; // High contrast white/grey for 8-bit guns
+    const skinShadow = '#c47038';
+    const gunMetal = '#e0e0e0';
+    const gunHighlight = '#ffffff';
     const OL = nesPalette.outline;
 
     ctx.save();
     ctx.translate(Math.floor(x), Math.floor(y));
 
-    // Ground Shadow (Solid blocky NES shadow)
-    drawPixel(ctx, -20, 70, 40, 6, 'rgba(0, 0, 0, 0.5)');
+    // Ground Shadow
+    drawPixel(ctx, -22, 70, 44, 6, 'rgba(0, 0, 0, 0.45)');
 
-    // --- HAT (Wide NES Brim) ---
-    drawPixel(ctx, -26, -22, 52, 6, OL);            // Brim Outline
-    drawPixel(ctx, -24, -20, 48, 4, hatColor);       // Brim Fill
-    drawPixel(ctx, -16, -36, 32, 16, OL);           // Crown Outline
-    drawPixel(ctx, -14, -34, 28, 14, hatColor);      // Crown Fill
-    drawPixel(ctx, -14, -24, 28, 4, accentColor);    // Vibrant Bandana/Hatband
+    // --- HAT (Curved 2x Brim + Creased Crown) ---
+    // Brim Outline & Fill
+    drawPixel(ctx, -28, -22, 56, 4, OL);
+    drawPixel(ctx, -26, -20, 52, 4, hatColor);
+    drawPixel(ctx, -28, -24, 4, 4, OL); // Curved brim ends
+    drawPixel(ctx, 24, -24, 4, 4, OL);
 
-    // --- HEAD & FACE ---
+    // Crown Outline & Top Crease
+    drawPixel(ctx, -16, -38, 32, 18, OL);
+    drawPixel(ctx, -14, -36, 28, 16, hatColor);
+    drawPixel(ctx, -6, -38, 12, 4, OL); // Crown pinch crease
+    drawPixel(ctx, -4, -36, 8, 2, '#201828');
+
+    // Patterned Hatband
+    drawPixel(ctx, -14, -24, 28, 4, accentColor);
+    drawPixel(ctx, -14, -22, 28, 2, OL);
+
+    // --- HEAD, HAIR & FACIAL FEATURES (2x Detail) ---
     drawPixel(ctx, -12, -16, 24, 22, OL);
     drawPixel(ctx, -10, -14, 20, 18, skinColor);
+    drawPixel(ctx, -10, -2, 20, 4, skinShadow); // Neck/Jaw shadow
 
-    // Hogan's Alley Expressive Features
-    const eyeX = dir * 3;
-    drawPixel(ctx, eyeX - 2, -10, 4, 6, OL);        // Large Expressive Eye
-    drawPixel(ctx, eyeX - 1, -9, 2, 2, '#ffffff');  // Eye Specular Highlight
-    drawPixel(ctx, eyeX - 6, -2, 12, 4, OL);         // Heavy Mustache / Jawline
+    // Sideburns
+    drawPixel(ctx, -dir * 10, -14, 4, 10, '#442800');
 
-    // --- TORSO & VEST ---
+    // Eyes with Pupils & Brows
+    const eyeX = dir * 4;
+    drawPixel(ctx, eyeX - 4, -12, 8, 2, OL);        // Eyebrow
+    drawPixel(ctx, eyeX - 4, -9, 8, 4, '#ffffff');  // Eye white
+    drawPixel(ctx, eyeX - 2, -9, 4, 4, OL);         // Pupil
+    drawPixel(ctx, eyeX - 1, -9, 2, 2, '#4890e0');  // Blue Iris glint
+
+    // Nose & Handlebar Mustache
+    drawPixel(ctx, eyeX, -5, 4, 2, skinShadow);     // Nose bridge
+    drawPixel(ctx, eyeX - 8, -3, 16, 4, '#442800'); // Mustache base
+    drawPixel(ctx, eyeX - 10, -1, 4, 4, '#442800'); // Curled tips
+    drawPixel(ctx, eyeX + 6, -1, 4, 4, '#442800');
+
+    // Silk Bandana / Scarf with Knot
+    drawPixel(ctx, -8, 6, 16, 8, accentColor);
+    drawPixel(ctx, -4, 8, 8, 8, accentColor);       // Hanging knot
+    drawPixel(ctx, -2, 10, 4, 6, '#ffffff');        // Highlight
+
+    // --- VEST, SHIRT & DETAILS ---
     drawPixel(ctx, -16, 6, 32, 34, OL);
     drawPixel(ctx, -14, 8, 28, 30, bodyColor);
 
-    // Scarf / Neckwear
-    drawPixel(ctx, -8, 6, 16, 8, accentColor);
+    // Shirt Collar & Button Line
+    drawPixel(ctx, -2, 10, 4, 24, '#ffffff');       // White under-shirt
+    drawPixel(ctx, -1, 14, 2, 2, '#442800');        // Buttons
+    drawPixel(ctx, -1, 20, 2, 2, '#442800');
+    drawPixel(ctx, -1, 26, 2, 2, '#442800');
 
-    // Gun Belt & Large Buckle
+    // Vest Seams / Shadow
+    drawPixel(ctx, -14, 8, 4, 30, 'rgba(0, 0, 0, 0.2)');
+    drawPixel(ctx, 10, 8, 4, 30, 'rgba(0, 0, 0, 0.2)');
+
+    // Gun Belt, Bullets & Buckle
     drawPixel(ctx, -16, 34, 32, 6, '#442800');
-    drawPixel(ctx, -4, 34, 8, 6, '#fce0a0');        // Brass Buckle
+    drawPixel(ctx, -10, 36, 3, 2, '#fce0a0');       // Ammo loops
+    drawPixel(ctx, -6, 36, 3, 2, '#fce0a0');
+    drawPixel(ctx, 4, 36, 3, 2, '#fce0a0');
+    drawPixel(ctx, 8, 36, 3, 2, '#fce0a0');
+    drawPixel(ctx, -3, 34, 6, 6, '#fce0a0');        // Buckle outer
+    drawPixel(ctx, -1, 36, 2, 2, '#442800');        // Buckle inner
 
-    // --- LEGS & BOOTS ---
+    // --- LEGS, JEANS & BOOT SPURS ---
     drawPixel(ctx, -14, 40, 12, 28, OL);
-    drawPixel(ctx, -12, 42, 8, 24, '#203864');       // Classic Blue Jeans
+    drawPixel(ctx, -12, 42, 8, 24, '#203864');
+    drawPixel(ctx, -10, 44, 4, 18, '#305088');      // Denim highlight
     drawPixel(ctx, 2, 40, 12, 28, OL);
     drawPixel(ctx, 4, 42, 8, 24, '#142444');
 
-    // Heavy Boots
+    // Boots with Heel Spurs
     drawPixel(ctx, -16, 62, 14, 8, OL);
     drawPixel(ctx, -14, 64, 10, 6, '#442800');
     drawPixel(ctx, 2, 62, 14, 8, OL);
     drawPixel(ctx, 4, 64, 10, 6, '#442800');
 
-    // --- ARM & GUN POSES ---
+    // Golden Boot Spurs
+    drawPixel(ctx, -dir * 16, 64, 4, 4, '#fce0a0');
+    drawPixel(ctx, -dir * 18, 65, 2, 2, '#fce0a0');
+
+    // --- ARMS & WEAPON (Detailed Peacemaker Revolver) ---
     if (drawArmUp) {
-        // Shooting Pose (Straight arm out with high-contrast Zapper-style revolver)
+        // Extended Shooting Arm
         drawPixel(ctx, dir * 12, 10, 20 * dir, 10, OL);
         drawPixel(ctx, dir * 14, 12, 16 * dir, 6, bodyColor);
         drawPixel(ctx, dir * 30, 12, 8 * dir, 6, skinColor);
 
-        // Revolver Pistol
-        drawPixel(ctx, dir * 36, 4, 18 * dir, 8, OL);
-        drawPixel(ctx, dir * 38, 6, 14 * dir, 4, gunColor);  // Chrome Barrel
-        drawPixel(ctx, dir * 32, 10, 6 * dir, 8, '#442800'); // Wooden Grip
+        // Revolver (Cylinder, Barrel, Hammer, Sight)
+        drawPixel(ctx, dir * 36, 4, 20 * dir, 8, OL);
+        drawPixel(ctx, dir * 38, 6, 16 * dir, 3, gunMetal);     // Barrel
+        drawPixel(ctx, dir * 38, 5, 14 * dir, 1, gunHighlight); // Barrel Reflection
+        drawPixel(ctx, dir * 54, 4, 2 * dir, 2, OL);            // Front Sight
+        drawPixel(ctx, dir * 36, 7, 6 * dir, 4, '#606060');     // Cylinder
+        drawPixel(ctx, dir * 32, 10, 6 * dir, 8, '#502814');    // Wood grip
+        drawPixel(ctx, dir * 32, 4, 2 * dir, 4, OL);            // Cocked Hammer
     } else {
-        // Idle Holster Pose (Hand resting low over gun belt)
-        drawPixel(ctx, dir * 12, 12, 10 * dir, 20, OL);
-        drawPixel(ctx, dir * 14, 14, 6 * dir, 16, bodyColor);
-        drawPixel(ctx, dir * 12, 28, 8 * dir, 8, skinColor); // Hand hovering at hip
+        // Holstered Idle Arm
+        drawPixel(ctx, dir * 12, 12, 10 * dir, 22, OL);
+        drawPixel(ctx, dir * 14, 14, 6 * dir, 18, bodyColor);
+        drawPixel(ctx, dir * 12, 30, 8 * dir, 8, skinColor);    // Hand resting on grip
+        drawPixel(ctx, dir * 16, 36, 6 * dir, 10, '#381808');   // Leather holster
     }
 
     ctx.restore();
@@ -268,22 +318,40 @@ function renderHogansBackground(ctx, width, height, tension, progress) {
     drawPixel(ctx, hotelX + 92, hotelY + 44, 16, 16, nesPalette.outline);
     drawPixel(ctx, hotelX + 94, hotelY + 46, 12, 12, '#fce0a0');
 
-    // --- 4. HITCHING POSTS & HORSE ---
-    // Wooden Rail Between Buildings
-    drawPixel(ctx, 215, groundY - 14, 110, 24, nesPalette.outline);
-    drawPixel(ctx, 217, groundY - 12, 106, 4, nesPalette.woodDark);
-    drawPixel(ctx, 225, groundY - 8, 6, 18, nesPalette.woodDark);
-    drawPixel(ctx, 305, groundY - 8, 6, 18, nesPalette.woodDark);
+    // High-Detail 8-Bit Horse tied to hitching post
+    const horseX = 240;
+    const horseY = groundY - 36;
 
-    // 8-Bit Horse Tied to Rail
-    const horseX = 245;
-    const horseY = groundY - 32;
-    drawPixel(ctx, horseX, horseY, 42, 28, nesPalette.outline);
-    drawPixel(ctx, horseX + 2, horseY + 2, 38, 24, '#502814');
-    drawPixel(ctx, horseX + 32, horseY - 8, 12, 20, nesPalette.outline);
-    drawPixel(ctx, horseX + 34, horseY - 6, 8, 16, '#502814');
-    drawPixel(ctx, horseX + 4, horseY + 26, 6, 12, nesPalette.outline);
-    drawPixel(ctx, horseX + 28, horseY + 26, 6, 12, nesPalette.outline);
+    // Body & Musculature
+    drawPixel(ctx, horseX, horseY, 46, 30, nesPalette.outline);
+    drawPixel(ctx, horseX + 2, horseY + 2, 42, 26, '#603018');
+    drawPixel(ctx, horseX + 8, horseY + 6, 28, 14, '#783c20'); // Flank highlight
+
+    // Neck & Head
+    drawPixel(ctx, horseX + 34, horseY - 12, 14, 24, nesPalette.outline);
+    drawPixel(ctx, horseX + 36, horseY - 10, 10, 20, '#603018');
+    drawPixel(ctx, horseX + 42, horseY - 16, 10, 12, nesPalette.outline); // Muzzle
+    drawPixel(ctx, horseX + 44, horseY - 14, 8, 10, '#502814');
+    drawPixel(ctx, horseX + 46, horseY - 12, 2, 2, '#ffffff');           // Eye glint
+    drawPixel(ctx, horseX + 38, horseY - 18, 4, 6, '#603018');            // Ears
+
+    // Dark Mane & Tail
+    drawPixel(ctx, horseX + 32, horseY - 12, 4, 16, '#201008'); // Mane
+    drawPixel(ctx, horseX - 4, horseY + 4, 6, 22, '#201008');   // Tail
+
+    // Leather Saddle & Stirrups
+    drawPixel(ctx, horseX + 14, horseY - 2, 16, 12, '#381808'); // Saddle
+    drawPixel(ctx, horseX + 16, horseY + 10, 2, 12, '#fce0a0'); // Stirrup leather
+    drawPixel(ctx, horseX + 14, horseY + 22, 6, 2, '#fce0a0');  // Stirrup iron
+
+    // Legs & Hooves
+    drawPixel(ctx, horseX + 4, horseY + 28, 6, 14, nesPalette.outline);
+    drawPixel(ctx, horseX + 6, horseY + 28, 4, 12, '#502814');
+    drawPixel(ctx, horseX + 4, horseY + 38, 6, 4, '#100804'); // Hoof
+
+    drawPixel(ctx, horseX + 32, horseY + 28, 6, 14, nesPalette.outline);
+    drawPixel(ctx, horseX + 34, horseY + 28, 4, 12, '#502814');
+    drawPixel(ctx, horseX + 32, horseY + 38, 6, 4, '#100804');
 
     // --- 5. GROUND DIRT & TRACK ---
     drawPixel(ctx, 0, groundY, width, height - groundY, nesPalette.ground);
