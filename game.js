@@ -11,70 +11,139 @@ const phases = {
     gameOver: 'gameOver',
 };
 
-// Expanded 8-Outlaw Roster for game.js
+// Expanded 12-Outlaw Roster for game.js
 const outlawRoster = [
+    // 1. Warmup / Tutorial Tier
     {
         name: "SNAKE-EYE SAM",
         bounty: "$250",
-        delayMs: 390, // Generous reaction window for warmup
+        delayMs: 400,
         outfit: { hat: '#6e2f35', body: '#7a3d30', accent: '#e2d19d' }
     },
     {
         name: "RUSTLER RICK",
-        bounty: "$400",
-        delayMs: 350,
+        bounty: "$450",
+        delayMs: 370,
         outfit: { hat: '#443018', body: '#8c5828', accent: '#306844' }
     },
+
+    // 2. Mid-Tier Desperados (Nods to classic Spaghetti Western figures)
     {
-        name: "CALAMITY KATE",
+        name: "TUCO THE RAT", // Nod to Tuco / The Ugly
         bounty: "$750",
-        delayMs: 310,
-        outfit: { hat: '#101522', body: '#704d2c', accent: '#cf5e4d' }
+        delayMs: 340,
+        outfit: { hat: '#9a7848', body: '#b08450', accent: '#e05840' }
     },
     {
-        name: "ONE-EYE PETE",
+        name: "EL INDIO", // Nod to Gian Maria Volonté's leader in For a Few Dollars More
         bounty: "$1,200",
-        delayMs: 275,
-        outfit: { hat: '#243654', body: '#4d6580', accent: '#79a67d' }
+        delayMs: 310,
+        outfit: { hat: '#2c1810', body: '#582418', accent: '#d4a040' }
     },
     {
-        name: "BANDIT BILL",
+        name: "WILD GROGGY", // Nod to Groggy (Indio's top lieutenant / Luigi Pistilli)
         bounty: "$1,800",
-        delayMs: 245,
-        outfit: { hat: '#181014', body: '#5c2420', accent: '#fce0a0' }
+        delayMs: 285,
+        outfit: { hat: '#1c2430', body: '#3c4c64', accent: '#8c9ca8' }
     },
     {
-        name: "SHADOW SETH",
+        name: "CAVANAUGH", // Nod to Red Cavanaugh from For a Few Dollars More
         bounty: "$2,500",
-        delayMs: 220,
-        outfit: { hat: '#14141c', body: '#2a3444', accent: '#a84c10' }
+        delayMs: 260,
+        outfit: { hat: '#482014', body: '#703824', accent: '#e8d4a0' }
+    },
+
+    // 3. High-Tier Gunslingers
+    {
+        name: "CUCHILLO", // Nod to The Big Gundown / Tomas Milian
+        bounty: "$3,500",
+        delayMs: 240,
+        outfit: { hat: '#5c4838', body: '#846044', accent: '#408868' }
     },
     {
-        name: "DEADEYE DAN",
+        name: "BARON SAXON", // Nod to the Saxon Gang in Death Rides a Horse
         bounty: "$5,000",
-        delayMs: 195, // Sub-200ms quick-draw
-        outfit: { hat: '#000000', body: '#242424', accent: '#d7a65f' }
+        delayMs: 220,
+        outfit: { hat: '#10141a', body: '#242a38', accent: '#c83428' }
     },
     {
-        name: "EL DIABLO",
+        name: "PATRIARCH ADAM", // Nod to the corrupt Saxon patriarch
+        bounty: "$7,500",
+        delayMs: 205,
+        outfit: { hat: '#382014', body: '#503020', accent: '#fce088' }
+    },
+
+    // 4. Boss & Sub-Boss Tier
+    {
+        name: "STENGEL", // Nod to Stengel from Sabata
         bounty: "$10,000",
-        delayMs: 175, // Boss-tier lightning speed
-        outfit: { hat: '#3c0a0a', body: '#140404', accent: '#e02814' }
+        delayMs: 190,
+        outfit: { hat: '#1c1c24', body: '#343444', accent: '#9070a8' }
+    },
+    {
+        name: "PATRIARCA", // Nod to The Grand Duel
+        bounty: "$15,000",
+        delayMs: 175,
+        outfit: { hat: '#0a0a0e', body: '#1a1820', accent: '#c02018' }
+    },
+    {
+        name: "THE MAN IN BLACK", // Ultimate Boss Showdown ("Sentenza" / Angel Eyes archetype)
+        bounty: "$25,000",
+        delayMs: 160, // True frame-perfect quick draw
+        outfit: { hat: '#000000', body: '#101014', accent: '#e0a020' }
+    },
+
+    // 5. Elite Desperado Tier
+    {
+        name: "MONCO THE HAWK", // Nod to the lone drifter archetype
+        bounty: "$30,000",
+        delayMs: 155,
+        outfit: { hat: '#3c3226', body: '#5c4e3c', accent: '#709080' }
+    },
+    {
+        name: "SNAKE O'HARA", // Nod to Bad Man's River
+        bounty: "$40,000",
+        delayMs: 150,
+        outfit: { hat: '#1c1814', body: '#4a2818', accent: '#d87040' }
+    },
+    {
+        name: "ROSCOE THE PREACHER", // Nod to Father John / Lewis in God's Gun
+        bounty: "$50,000",
+        delayMs: 145,
+        outfit: { hat: '#101014', body: '#1c1c24', accent: '#e8e8f0' }
+    },
+    {
+        name: "GRIFFIN THE BUTCHER", // Nod to Griffin / Captain Apache rivals
+        bounty: "$65,000",
+        delayMs: 140,
+        outfit: { hat: '#341c18', body: '#602820', accent: '#f4c060' }
+    },
+    {
+        name: "MAJOR APONTE", // Nod to Return of Sabata / corrupt garrison commanders
+        bounty: "$80,000",
+        delayMs: 135,
+        outfit: { hat: '#142034', body: '#203454', accent: '#d4b038' }
+    },
+    {
+        name: "THE DEVIL'S APPRENTICE", // Ultimate Mythic Duel (Frame-perfect boss)
+        bounty: "$100,000",
+        delayMs: 130, // Extremely fast ~8-frame window
+        outfit: { hat: '#08080c', body: '#141418', accent: '#c81818' }
     }
 ];
 
-// In game.js
+// Function in game.js
 function getOutlawForRound(round) {
     const index = (round - 1) % outlawRoster.length;
     const base = outlawRoster[index];
 
-    // Each full pass through the roster shaves 15ms off reaction times
+    // Each full 12-bounty loop shaves 10ms off the draw window
     const loop = Math.floor((round - 1) / outlawRoster.length);
-    const speedBoost = loop * 15;
+    const speedBoost = loop * 10;
 
     return {
         ...base,
-        // Floor at 110ms so human players still have a fighting chance
+        // Floor at 110ms so it remains humanly beatable on keyboard/touch
         currentDelay: Math.max(110, base.delayMs - speedBoost)
     };
 }
