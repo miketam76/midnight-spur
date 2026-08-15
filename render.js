@@ -770,9 +770,11 @@ export function createRenderer(canvas) {
                 drawHeroVanCleef(context, playerX, cowboyY, state.playerHasDrawn);
             }
 
-            // Opponent Render (Standard Outlaw Sprite with Outfit Roster Colors)
+            // Opponent Render (Checks if it's Blondie or standard outlaw)
             if (state.opponentDeathProgress > 0) {
                 drawHogansFallenCowboy(context, opponentX, cowboyY, state.opponentOutfit, true, state.opponentDeathProgress);
+            } else if (state.currentOutlaw && state.currentOutlaw.isBlondie) {
+                drawBlondieCowboy(context, opponentX, cowboyY, state.opponentHasDrawn);
             } else {
                 drawHogansCowboy(context, opponentX, cowboyY, state.opponentOutfit, true, state.opponentHasDrawn);
             }
