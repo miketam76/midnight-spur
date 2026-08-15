@@ -384,11 +384,11 @@ export function createRenderer(canvas) {
             context.textAlign = 'center';
             context.fillText(state.phaseLabel, width / 2, height - 44);
 
-            // Screen Flash
-            if (state.flash) {
-                context.fillStyle = `rgba(255, 255, 255, ${state.flash})`;
-                context.fillRect(0, 0, width, height);
-            }
+            // Screen Flash - disabled for now
+            // if (state.flash) {
+            //     context.fillStyle = `rgba(255, 255, 255, ${state.flash})`;
+            //     context.fillRect(0, 0, width, height);
+            // }
 
             context.restore();
         },
