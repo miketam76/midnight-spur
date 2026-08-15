@@ -168,6 +168,37 @@ function clamp(value, min, max) {
     return Math.min(max, Math.max(min, value));
 }
 
+function updateTumbleweed(state, width = 640, height = 400) {
+    const tw = state.tumbleweed;
+    if (!tw) return;
+
+    if (!tw.active) {
+        tw.timer--;
+        if (tw.timer <= 0) {
+            tw.active = true;
+            tw.x = -30;
+            // Spawns along the lower dirt street
+            tw.y = Math.floor(height * 0.76) + Math.random() * 16;
+            tw.vx = 1.4 + Math.random() * 1.0;
+            tw.rotation = 0;
+            tw.bouncePhase = 0;
+        }
+    } else {
+        tw.x += tw.vx;
+        tw.rotation += 0.08;
+        tw.bouncePhase += 0.06;
+
+        // Small parabolic bounce while rolling
+        tw.currentY = tw.y - Math.abs(Math.sin(tw.bouncePhase) * 7);
+
+        // Reset once it rolls completely off the right edge
+        if (tw.x > width + 40) {
+            tw.active = false;
+            tw.timer = 180 + Math.floor(Math.random() * 240); // 3-7 second delay before next roll
+        }
+    }
+}
+
 export function createGame(dom) {
     const canvas = dom.canvas;
     const renderer = createRenderer(canvas);
@@ -206,6 +237,16 @@ export function createGame(dom) {
         pendingTransition: null,
         pendingTransitionAt: 0,
         pauseStartedAt: 0,
+        tumbleweed: {
+            x: -40,
+            y: 320,
+            currentY: 320,
+            vx: 1.8,
+            rotation: 0,
+            bouncePhase: 0,
+            active: false,
+            timer: 60 // Starts rolling soon after launch
+        },
     };
 
     function isActivePhase() {
@@ -506,6 +547,8 @@ export function createGame(dom) {
         }
 
         state.screenShake = Math.max(0, state.screenShake - 0.08);
+
+        updateTumbleweed(state, canvas.width, canvas.height);
 
         if (state.pendingTransition && now >= state.pendingTransitionAt) {
             runPendingTransition();
