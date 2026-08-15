@@ -1,4 +1,4 @@
-// render.js - Midnight Spur (Clean Fixed Palette & Muzzle Blast)
+// render.js - Midnight Spur (Cinematic Responsive Framing Edition)
 
 const snesPalette = {
     skyTop: '#0a0d1a',
@@ -13,7 +13,6 @@ const snesPalette = {
     outline: '#000000',
 };
 
-// Backward-compatibility alias to prevent any naming reference errors
 const nesPalette = snesPalette;
 
 function drawPixel(ctx, x, y, width, height, color) {
@@ -45,27 +44,24 @@ function drawTimerMeter(ctx, width, progress) {
     }
 }
 
-// Animated 8-Bit Muzzle Flash & Drifting Smoke
+// Animated Muzzle Blast & Drifting Smoke
 function drawMuzzleBlast(ctx, x, y, facingLeft, flashFrame) {
     const dir = facingLeft ? -1 : 1;
 
     ctx.save();
     ctx.translate(Math.floor(x), Math.floor(y));
 
-    // Starburst Flash
     if (flashFrame > 3) {
         drawPixel(ctx, dir * 6, -8, 14 * dir, 16, '#e04810');
         drawPixel(ctx, dir * 8, -6, 10 * dir, 12, '#f87820');
-        drawPixel(ctx, dir * 10, -4, 6 * dir, 8, '#fce088');
+        drawPixel(ctx, dir * 10, -4, 6 * dir, 8, '#fce0a0');
         drawPixel(ctx, dir * 12, -2, 4 * dir, 4, '#ffffff');
 
-        // Sparks
         drawPixel(ctx, dir * 24, -6, 3 * dir, 2, '#ffffff');
         drawPixel(ctx, dir * 20, 6, 4 * dir, 2, '#fce0a0');
         drawPixel(ctx, dir * 18, -12, 3 * dir, 2, '#f87820');
     }
 
-    // Dissipating Smoke Puffs
     if (flashFrame > 0) {
         const expand = (6 - flashFrame) * 2;
         drawPixel(ctx, dir * (18 + expand), -4 - expand, 8, 8, 'rgba(216, 216, 224, 0.75)');
@@ -207,7 +203,6 @@ function drawBlondieCowboy(ctx, x, y, drawArmUp) {
     ctx.save();
     ctx.translate(Math.floor(x), Math.floor(y));
 
-    // Shadow
     drawPixel(ctx, -24, 70, 48, 6, 'rgba(0, 0, 0, 0.45)');
 
     // 1. Hat
@@ -617,7 +612,7 @@ function renderHogansBackground(ctx, width, height, tension, progress) {
 
     drawPixel(ctx, storeX + 12, storeY + 48, 38, 30, snesPalette.outline);
     drawPixel(ctx, storeX + 14, storeY + 50, 34, 26, '#181014');
-    drawPixel(ctx, storeX + 105, storeY + 48, 38, 30, snesPalette.outline);
+    drawPixel(ctx, storeX + 105, storeY + 48, 38, 30, nesPalette.outline);
     drawPixel(ctx, storeX + 107, storeY + 50, 34, 26, '#181014');
 
     // 5. HOTEL
@@ -689,8 +684,8 @@ function renderHogansBackground(ctx, width, height, tension, progress) {
     drawPixel(ctx, horseX - 4, horseY + 4, 6, 24, '#180804');
     drawPixel(ctx, horseX + 44, horseY - 12, 2, 12, '#fce0a0');
 
-    drawPixel(ctx, horseX + 4, horseY + 30, 6, 14, snesPalette.outline);
-    drawPixel(ctx, horseX + 34, horseY + 30, 6, 14, snesPalette.outline);
+    drawPixel(ctx, horseX + 4, horseY + 30, 6, 14, nesPalette.outline);
+    drawPixel(ctx, horseX + 34, horseY + 30, 6, 14, nesPalette.outline);
 
     // 7. BOARDWALK & STREET RUTS
     drawPixel(ctx, 0, groundY - 2, width, 6, snesPalette.outline);
@@ -743,40 +738,6 @@ function drawWantedPoster(ctx, width, height, outlaw) {
     ctx.fillText(`REWARD ${outlaw.bounty}`, width / 2, cardY + 290);
 }
 
-// Rolling 8-Bit Pixel Tumbleweed
-function drawTumbleweed(ctx, tw) {
-    if (!tw || !tw.active) return;
-
-    ctx.save();
-    const drawY = tw.currentY !== undefined ? tw.currentY : tw.y;
-    ctx.translate(Math.floor(tw.x), Math.floor(drawY));
-    ctx.rotate(tw.rotation || 0);
-
-    // Shadow under tumbleweed
-    drawPixel(ctx, -7, 10, 14, 3, 'rgba(0, 0, 0, 0.25)');
-
-    // Straw colors (ochre & deep brown)
-    const strawDark = '#6e4822';
-    const strawMid = '#a4743c';
-    const strawLight = '#d49c58';
-
-    // Core body
-    drawPixel(ctx, -8, -8, 16, 16, strawDark);
-    drawPixel(ctx, -6, -6, 12, 12, strawMid);
-    drawPixel(ctx, -4, -4, 8, 8, strawLight);
-
-    // Prickly outer twigs
-    drawPixel(ctx, -10, -2, 3, 4, strawDark);
-    drawPixel(ctx, 7, -2, 3, 4, strawDark);
-    drawPixel(ctx, -2, -10, 4, 3, strawDark);
-    drawPixel(ctx, -2, 7, 4, 3, strawDark);
-
-    drawPixel(ctx, -6, 2, 4, 2, strawMid);
-    drawPixel(ctx, 2, -6, 2, 4, strawLight);
-
-    ctx.restore();
-}
-
 export function createRenderer(canvas) {
     const context = canvas.getContext('2d');
     const width = canvas.width;
@@ -800,16 +761,27 @@ export function createRenderer(canvas) {
                 return;
             }
 
-            renderHogansBackground(context, width, height, state.tension, state.progress);
+            // --- CINEMATIC DYNAMIC FRAMING ON MOBILE ---
+            // If canvas width is under 520px (e.g., narrow mobile portrait viewport),
+            // zoom into the standoff center so character details stay big and sharp.
+            const isNarrowMobile = typeof window !== 'undefined' && window.innerWidth < 520;
+            const zoomScale = isNarrowMobile ? 1.8 : 1.0;
 
-            if (state.tumbleweed && state.tumbleweed.active) {
-                drawTumbleweed(context, state.tumbleweed);
+            context.save();
+            if (isNarrowMobile) {
+                // Focus camera directly on the standoff zone
+                const focalX = width * 0.50;
+                const focalY = height * 0.40;
+                context.translate(focalX, focalY);
+                context.scale(zoomScale, zoomScale);
+                context.translate(-focalX, -focalY);
             }
 
-            drawTimerMeter(context, width, state.countdownProgress);
+            renderHogansBackground(context, width, height, state.tension, state.progress);
 
-            const playerX = width * 0.26;
-            const opponentX = width * 0.74;
+            // Standoff positions (tucked closer on mobile zoom)
+            const playerX = isNarrowMobile ? width * 0.28 : width * 0.26;
+            const opponentX = isNarrowMobile ? width * 0.72 : width * 0.74;
             const cowboyY = height * 0.40;
 
             // Player Render
@@ -838,7 +810,11 @@ export function createRenderer(canvas) {
                 }
             }
 
-            // Phase Text Overlay
+            context.restore(); // Exit zoom transform for HUD elements
+
+            // Non-scaled HUD overlays for crisp UI text
+            drawTimerMeter(context, width, state.countdownProgress);
+
             context.fillStyle = '#fce0a0';
             context.font = '28px "Press Start 2P", monospace';
             context.textAlign = 'center';
