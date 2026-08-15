@@ -243,119 +243,219 @@ function drawHogansFallenCowboy(ctx, x, y, outfit, facingLeft, progress) {
     ctx.restore();
 }
 
-// Wild West Town Background (Rescaled Architecture)
+// High-Detail 16-Bit Town Scenery (Saloon, Hotel, Signs & Boardwalks)
 function renderHogansBackground(ctx, width, height, tension, progress) {
     const skySplit = Math.floor(height * 0.52);
 
-    // Stark 8-Bit Sky Banding
-    drawPixel(ctx, 0, 0, width, skySplit * 0.35, nesPalette.skyTop);
-    drawPixel(ctx, 0, skySplit * 0.35, width, skySplit * 0.3, nesPalette.skyMid);
-    drawPixel(ctx, 0, skySplit * 0.65, width, skySplit * 0.35, nesPalette.skyBottom);
+    // Banded 16-Bit Dusk Sky with Warm Horizon Glow
+    drawPixel(ctx, 0, 0, width, skySplit * 0.30, '#0a0d1a');
+    drawPixel(ctx, 0, skySplit * 0.30, width, skySplit * 0.25, '#2c1820');
+    drawPixel(ctx, 0, skySplit * 0.55, width, skySplit * 0.22, '#642818');
+    drawPixel(ctx, 0, skySplit * 0.77, width, skySplit * 0.23, '#a84c10');
 
-    const groundY = skySplit - 8;
+    // Distant Desert Mesa Silhouettes
+    const mesaY = skySplit - 68;
+    drawPixel(ctx, 60, mesaY + 16, 140, 48, '#381610');
+    drawPixel(ctx, 90, mesaY, 80, 16, '#381610');
+    drawPixel(ctx, width - 260, mesaY + 22, 160, 42, '#381610');
+    drawPixel(ctx, width - 220, mesaY + 8, 90, 14, '#381610');
 
-    // --- 1. TWO-STORY SALOON (Left Building) ---
-    const saloonX = 10;
-    const saloonW = 190;
-    const saloonH = 140;
+    const groundY = skySplit - 6;
+
+    // --- 1. TWO-STORY BRICK & WOOD SALOON (Left Building) ---
+    const saloonX = 8;
+    const saloonW = 196;
+    const saloonH = 152;
     const saloonY = groundY - saloonH + 10;
 
-    // Main Brick Structure
+    // Main Brickwork Facade & Mortar Details
     drawPixel(ctx, saloonX, saloonY, saloonW, saloonH, nesPalette.outline);
-    drawPixel(ctx, saloonX + 4, saloonY + 4, saloonW - 8, saloonH - 8, '#882800');
+    drawPixel(ctx, saloonX + 2, saloonY + 2, saloonW - 4, saloonH - 4, '#7c2814');
 
-    // Ornamental Roof Parapet
-    drawPixel(ctx, saloonX + 20, saloonY - 16, saloonW - 40, 16, nesPalette.outline);
-    drawPixel(ctx, saloonX + 24, saloonY - 12, saloonW - 48, 12, nesPalette.woodDark);
+    // Horizontal Brick Mortar Lines
+    for (let row = saloonY + 4; row < groundY + 6; row += 8) {
+        drawPixel(ctx, saloonX + 4, row, saloonW - 8, 1, '#581c0e');
+    }
 
-    // Saloon Main Signboard
-    drawPixel(ctx, saloonX + 25, saloonY + 12, 140, 20, nesPalette.outline);
-    drawPixel(ctx, saloonX + 28, saloonY + 14, 134, 16, nesPalette.woodLight);
+    // False-Front Stepped Cornice / Roof Parapet
+    drawPixel(ctx, saloonX + 16, saloonY - 18, saloonW - 32, 18, nesPalette.outline);
+    drawPixel(ctx, saloonX + 18, saloonY - 16, saloonW - 36, 14, '#44140a');
+    drawPixel(ctx, saloonX + 40, saloonY - 26, saloonW - 80, 8, nesPalette.outline);
+    drawPixel(ctx, saloonX + 42, saloonY - 24, saloonW - 84, 6, '#581c0e');
 
-    // Upper Floor Windows
-    drawPixel(ctx, saloonX + 25, saloonY + 42, 32, 28, nesPalette.outline);
-    drawPixel(ctx, saloonX + 133, saloonY + 42, 32, 28, nesPalette.outline);
+    // "SALOON" Signboard Frame & Gold Lettering
+    const sSignX = saloonX + 26;
+    const sSignY = saloonY + 10;
+    const sSignW = 144;
+    const sSignH = 22;
+    drawPixel(ctx, sSignX - 2, sSignY - 2, sSignW + 4, sSignH + 4, nesPalette.outline);
+    drawPixel(ctx, sSignX, sSignY, sSignW, sSignH, '#2a1408');
+    drawPixel(ctx, sSignX + 2, sSignY + 2, sSignW - 4, sSignH - 4, '#d89c58');
+    drawPixel(ctx, sSignX + 4, sSignY + 4, sSignW - 8, sSignH - 8, '#3a1a0c');
 
-    // Lower Floor Batwing Doors & Porch Pillars
-    drawPixel(ctx, saloonX + 75, saloonY + 84, 40, 48, nesPalette.outline);
-    drawPixel(ctx, saloonX + 78, saloonY + 92, 34, 30, nesPalette.woodDark);
-    drawPixel(ctx, saloonX + 10, saloonY + 80, 8, 52, nesPalette.outline);
-    drawPixel(ctx, saloonX + 172, saloonY + 80, 8, 52, nesPalette.outline);
+    // 16-Bit Pixel-Drawn "SALOON" Text
+    ctx.fillStyle = '#fce0a0';
+    ctx.font = '12px "Press Start 2P", monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText("SALOON", sSignX + sSignW / 2, sSignY + 16);
 
-    // --- 2. HOTEL & SHERIFF OFFICE (Right Building) ---
-    const hotelX = width - 210;
-    const hotelW = 200;
-    const hotelH = 150;
+    // Upper Floor Windows (Panes + Curtains)
+    [saloonX + 24, saloonX + 136].forEach((winX) => {
+        drawPixel(ctx, winX - 2, saloonY + 42, 36, 32, nesPalette.outline);
+        drawPixel(ctx, winX, saloonY + 44, 32, 28, '#100c14');
+        drawPixel(ctx, winX + 2, saloonY + 46, 8, 24, '#a82c18'); // Red Curtain
+        drawPixel(ctx, winX + 22, saloonY + 46, 8, 24, '#a82c18');
+        drawPixel(ctx, winX + 15, saloonY + 44, 2, 28, '#44140a'); // Window Mullion
+        drawPixel(ctx, winX, saloonY + 58, 32, 2, '#44140a');
+    });
+
+    // Lower Floor Porch Roof & Support Pillars
+    drawPixel(ctx, saloonX - 4, saloonY + 84, saloonW + 8, 8, nesPalette.outline);
+    drawPixel(ctx, saloonX - 2, saloonY + 86, saloonW + 4, 4, '#582410');
+    drawPixel(ctx, saloonX + 8, saloonY + 92, 6, 48, nesPalette.outline);
+    drawPixel(ctx, saloonX + 10, saloonY + 92, 4, 48, '#a87038');
+    drawPixel(ctx, saloonX + 180, saloonY + 92, 6, 48, nesPalette.outline);
+    drawPixel(ctx, saloonX + 182, saloonY + 92, 4, 48, '#a87038');
+
+    // Batwing Swinging Doors
+    const doorX = saloonX + 78;
+    const doorY = saloonY + 94;
+    drawPixel(ctx, doorX - 4, doorY - 4, 44, 46, nesPalette.outline);
+    drawPixel(ctx, doorX - 2, doorY - 2, 40, 44, '#100804');
+    drawPixel(ctx, doorX, doorY + 6, 18, 28, '#884414'); // Left Flap
+    drawPixel(ctx, doorX + 20, doorY + 6, 18, 28, '#884414'); // Right Flap
+    drawPixel(ctx, doorX + 2, doorY + 12, 14, 2, '#502808'); // Slats
+    drawPixel(ctx, doorX + 2, doorY + 20, 14, 2, '#502808');
+    drawPixel(ctx, doorX + 22, doorY + 12, 14, 2, '#502808');
+    drawPixel(ctx, doorX + 22, doorY + 20, 14, 2, '#502808');
+
+    // --- 2. TWO-STORY CLAPBOARD HOTEL (Right Building) ---
+    const hotelX = width - 216;
+    const hotelW = 208;
+    const hotelH = 160;
     const hotelY = groundY - hotelH + 10;
 
-    // Wooden Siding Building
+    // Clapboard Siding Facade
     drawPixel(ctx, hotelX, hotelY, hotelW, hotelH, nesPalette.outline);
-    drawPixel(ctx, hotelX + 4, hotelY + 4, hotelW - 8, hotelH - 8, nesPalette.woodLight);
+    drawPixel(ctx, hotelX + 2, hotelY + 2, hotelW - 4, hotelH - 4, '#a87848');
 
-    // Hotel Signboard Top
-    drawPixel(ctx, hotelX + 30, hotelY + 10, 140, 18, nesPalette.outline);
-    drawPixel(ctx, hotelX + 34, hotelY + 12, 132, 14, nesPalette.woodDark);
+    // Horizontal Wooden Siding Planks
+    for (let row = hotelY + 4; row < groundY + 6; row += 6) {
+        drawPixel(ctx, hotelX + 2, row, hotelW - 4, 1, '#78502c');
+    }
 
-    // Upper Floor Windows
-    drawPixel(ctx, hotelX + 20, hotelY + 38, 30, 32, nesPalette.outline);
-    drawPixel(ctx, hotelX + 85, hotelY + 38, 30, 32, nesPalette.outline);
-    drawPixel(ctx, hotelX + 150, hotelY + 38, 30, 32, nesPalette.outline);
+    // Hotel Top Cornice Header
+    drawPixel(ctx, hotelX - 4, hotelY - 14, hotelW + 8, 14, nesPalette.outline);
+    drawPixel(ctx, hotelX - 2, hotelY - 12, hotelW + 4, 10, '#582410');
 
-    // Hotel Balcony Trim
-    drawPixel(ctx, hotelX + 10, hotelY + 78, 180, 8, nesPalette.outline);
-    drawPixel(ctx, hotelX + 12, hotelY + 80, 176, 4, nesPalette.woodDark);
+    // "HOTEL" Signboard Frame & Dark Lettering
+    const hSignX = hotelX + 34;
+    const hSignY = hotelY + 10;
+    const hSignW = 140;
+    const hSignH = 22;
+    drawPixel(ctx, hSignX - 2, hSignY - 2, hSignW + 4, hSignH + 4, nesPalette.outline);
+    drawPixel(ctx, hSignX, hSignY, hSignW, hSignH, '#381808');
+    drawPixel(ctx, hSignX + 2, hSignY + 2, hSignW - 4, hSignH - 4, '#e4d0a0');
 
-    // Lower Floor Windows
-    drawPixel(ctx, hotelX + 30, hotelY + 96, 32, 36, nesPalette.outline);
-    drawPixel(ctx, hotelX + 138, hotelY + 96, 32, 36, nesPalette.outline);
+    // 16-Bit Pixel-Drawn "HOTEL" Text
+    ctx.fillStyle = '#201008';
+    ctx.font = '12px "Press Start 2P", monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText("HOTEL", hSignX + hSignW / 2, hSignY + 16);
 
-    // --- 3. TOWNSFOLK SPECTATORS ---
-    // Peeking from Saloon Upper Window
-    drawPixel(ctx, saloonX + 35, saloonY + 48, 12, 12, '#fce0a0');
-    drawPixel(ctx, saloonX + 33, saloonY + 44, 16, 6, nesPalette.outline);
+    // Upper Floor Windows (3 Sets)
+    [hotelX + 18, hotelX + 86, hotelX + 154].forEach((winX) => {
+        drawPixel(ctx, winX - 2, hotelY + 40, 36, 30, nesPalette.outline);
+        drawPixel(ctx, winX, hotelY + 42, 32, 26, '#181014');
+        drawPixel(ctx, winX + 2, hotelY + 44, 6, 22, '#4878a8'); // Blue Curtains
+        drawPixel(ctx, winX + 24, hotelY + 44, 6, 22, '#4878a8');
+        drawPixel(ctx, winX + 15, hotelY + 42, 2, 26, '#583018');
+        drawPixel(ctx, winX, hotelY + 54, 32, 2, '#583018');
+    });
 
-    // Standing in Hotel Window
-    drawPixel(ctx, hotelX + 92, hotelY + 44, 16, 16, nesPalette.outline);
-    drawPixel(ctx, hotelX + 94, hotelY + 46, 12, 12, '#fce0a0');
+    // Second Floor Balcony Railing & Deck
+    drawPixel(ctx, hotelX - 6, hotelY + 80, hotelW + 12, 6, nesPalette.outline);
+    drawPixel(ctx, hotelX - 4, hotelY + 82, hotelW + 8, 3, '#d89c58'); // Balcony Floor
+    for (let post = hotelX; post < hotelX + hotelW; post += 12) {
+        drawPixel(ctx, post, hotelY + 70, 2, 10, '#381808'); // Spindles
+    }
+    drawPixel(ctx, hotelX - 4, hotelY + 68, hotelW + 8, 3, '#381808'); // Handrail
 
-    // High-Detail 8-Bit Horse tied to hitching post
-    const horseX = 240;
-    const horseY = groundY - 36;
+    // Lower Floor Hotel Entrance & Windows
+    drawPixel(ctx, hotelX + 22, hotelY + 98, 36, 36, nesPalette.outline);
+    drawPixel(ctx, hotelX + 24, hotelY + 100, 32, 32, '#181014');
+    drawPixel(ctx, hotelX + 148, hotelY + 98, 36, 36, nesPalette.outline);
+    drawPixel(ctx, hotelX + 150, hotelY + 100, 32, 32, '#181014');
 
-    // Body & Musculature
-    drawPixel(ctx, horseX, horseY, 46, 30, nesPalette.outline);
-    drawPixel(ctx, horseX + 2, horseY + 2, 42, 26, '#603018');
-    drawPixel(ctx, horseX + 8, horseY + 6, 28, 14, '#783c20'); // Flank highlight
+    // Double Glass Entrance Doors
+    drawPixel(ctx, hotelX + 82, hotelY + 94, 44, 46, nesPalette.outline);
+    drawPixel(ctx, hotelX + 84, hotelY + 96, 40, 44, '#482010');
+    drawPixel(ctx, hotelX + 88, hotelY + 100, 14, 24, '#181014');
+    drawPixel(ctx, hotelX + 106, hotelY + 100, 14, 24, '#181014');
+
+    // --- 3. TOWNSFOLK SPECTATORS (Window Observers) ---
+    // Woman with Bun in Saloon Upper Window
+    drawPixel(ctx, saloonX + 34, saloonY + 50, 12, 12, '#fcb070');
+    drawPixel(ctx, saloonX + 32, saloonY + 46, 16, 6, '#381408'); // Hair Bun
+    drawPixel(ctx, saloonX + 36, saloonY + 54, 2, 2, '#000000'); // Eye
+
+    // Sheriff Peeking from Hotel Upper Window
+    drawPixel(ctx, hotelX + 96, hotelY + 50, 12, 12, '#fcb070');
+    drawPixel(ctx, hotelX + 92, hotelY + 46, 20, 4, '#181008'); // Black Stetson Hat
+    drawPixel(ctx, hotelX + 96, hotelY + 42, 12, 6, '#181008');
+    drawPixel(ctx, hotelX + 98, hotelY + 56, 8, 2, '#381408');  // Mustache
+
+    // --- 4. WOODEN HITCHING POST RAIL & DETAILED HORSE ---
+    drawPixel(ctx, 214, groundY - 16, 116, 24, nesPalette.outline);
+    drawPixel(ctx, 216, groundY - 14, 112, 4, '#88481c');
+    drawPixel(ctx, 222, groundY - 10, 6, 20, '#582c0e');
+    drawPixel(ctx, 318, groundY - 10, 6, 20, '#582c0e');
+
+    // High-Detail 16-Bit Horse
+    const horseX = 244;
+    const horseY = groundY - 38;
+
+    // Musculature & Torso
+    drawPixel(ctx, horseX, horseY, 48, 32, nesPalette.outline);
+    drawPixel(ctx, horseX + 2, horseY + 2, 44, 28, '#582810');
+    drawPixel(ctx, horseX + 8, horseY + 6, 30, 16, '#703418'); // Highlight
 
     // Neck & Head
-    drawPixel(ctx, horseX + 34, horseY - 12, 14, 24, nesPalette.outline);
-    drawPixel(ctx, horseX + 36, horseY - 10, 10, 20, '#603018');
-    drawPixel(ctx, horseX + 42, horseY - 16, 10, 12, nesPalette.outline); // Muzzle
-    drawPixel(ctx, horseX + 44, horseY - 14, 8, 10, '#502814');
-    drawPixel(ctx, horseX + 46, horseY - 12, 2, 2, '#ffffff');           // Eye glint
-    drawPixel(ctx, horseX + 38, horseY - 18, 4, 6, '#603018');            // Ears
+    drawPixel(ctx, horseX + 36, horseY - 14, 14, 26, nesPalette.outline);
+    drawPixel(ctx, horseX + 38, horseY - 12, 10, 22, '#582810');
+    drawPixel(ctx, horseX + 44, horseY - 18, 12, 14, nesPalette.outline);
+    drawPixel(ctx, horseX + 46, horseY - 16, 8, 10, '#441c08');
+    drawPixel(ctx, horseX + 48, horseY - 14, 2, 2, '#ffffff'); // Eye Glint
+    drawPixel(ctx, horseX + 40, horseY - 20, 4, 6, '#582810'); // Ears
 
-    // Dark Mane & Tail
-    drawPixel(ctx, horseX + 32, horseY - 12, 4, 16, '#201008'); // Mane
-    drawPixel(ctx, horseX - 4, horseY + 4, 6, 22, '#201008');   // Tail
+    // Mane, Bridle & Tail
+    drawPixel(ctx, horseX + 34, horseY - 14, 4, 18, '#180804'); // Dark Mane
+    drawPixel(ctx, horseX - 4, horseY + 4, 6, 24, '#180804');   // Flowing Tail
+    drawPixel(ctx, horseX + 44, horseY - 12, 2, 12, '#fce0a0'); // Bridle Strap
 
-    // Leather Saddle & Stirrups
-    drawPixel(ctx, horseX + 14, horseY - 2, 16, 12, '#381808'); // Saddle
-    drawPixel(ctx, horseX + 16, horseY + 10, 2, 12, '#fce0a0'); // Stirrup leather
-    drawPixel(ctx, horseX + 14, horseY + 22, 6, 2, '#fce0a0');  // Stirrup iron
+    // Saddle & Stirrup
+    drawPixel(ctx, horseX + 16, horseY - 2, 18, 14, '#2c1408'); // Dark Leather Saddle
+    drawPixel(ctx, horseX + 18, horseY + 12, 2, 12, '#fce0a0'); // Stirrup Strap
+    drawPixel(ctx, horseX + 16, horseY + 24, 6, 2, '#ffffff');  // Iron Stirrup
 
     // Legs & Hooves
-    drawPixel(ctx, horseX + 4, horseY + 28, 6, 14, nesPalette.outline);
-    drawPixel(ctx, horseX + 6, horseY + 28, 4, 12, '#502814');
-    drawPixel(ctx, horseX + 4, horseY + 38, 6, 4, '#100804'); // Hoof
+    drawPixel(ctx, horseX + 4, horseY + 30, 6, 14, nesPalette.outline);
+    drawPixel(ctx, horseX + 6, horseY + 30, 4, 12, '#441c08');
+    drawPixel(ctx, horseX + 4, horseY + 40, 6, 4, '#0c0604'); // Hoof
 
-    drawPixel(ctx, horseX + 32, horseY + 28, 6, 14, nesPalette.outline);
-    drawPixel(ctx, horseX + 34, horseY + 28, 4, 12, '#502814');
-    drawPixel(ctx, horseX + 32, horseY + 38, 6, 4, '#100804');
+    drawPixel(ctx, horseX + 34, horseY + 30, 6, 14, nesPalette.outline);
+    drawPixel(ctx, horseX + 36, horseY + 30, 4, 12, '#441c08');
+    drawPixel(ctx, horseX + 34, horseY + 40, 6, 4, '#0c0604');
 
-    // --- 5. GROUND DIRT & TRACK ---
-    drawPixel(ctx, 0, groundY, width, height - groundY, nesPalette.ground);
-    drawPixel(ctx, 0, groundY + 42, width, 14, nesPalette.groundDark);
+    // --- 5. WOODEN BOARDWALK & MAIN DIRT STREET ---
+    // Sidewalk Wooden Boardwalk Planking
+    drawPixel(ctx, 0, groundY - 2, width, 6, nesPalette.outline);
+    drawPixel(ctx, 0, groundY, width, 3, '#a87848');
+
+    // Main Dirt Street with Deep Cart Wheel Ruts
+    drawPixel(ctx, 0, groundY + 3, width, height - (groundY + 3), '#b87034');
+    drawPixel(ctx, 0, groundY + 24, width, 6, '#884c1c');  // Upper Wagon Track
+    drawPixel(ctx, 0, groundY + 54, width, 10, '#6c3810'); // Lower Deep Shadow Track
 }
 
 // Render 8-Bit Wanted Poster Screen
