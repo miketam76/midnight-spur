@@ -11,41 +11,71 @@ const phases = {
     gameOver: 'gameOver',
 };
 
+// Expanded 8-Outlaw Roster for game.js
 const outlawRoster = [
     {
         name: "SNAKE-EYE SAM",
         bounty: "$250",
-        delayMs: 380,
+        delayMs: 390, // Generous reaction window for warmup
         outfit: { hat: '#6e2f35', body: '#7a3d30', accent: '#e2d19d' }
     },
     {
+        name: "RUSTLER RICK",
+        bounty: "$400",
+        delayMs: 350,
+        outfit: { hat: '#443018', body: '#8c5828', accent: '#306844' }
+    },
+    {
         name: "CALAMITY KATE",
-        bounty: "$500",
-        delayMs: 320,
+        bounty: "$750",
+        delayMs: 310,
         outfit: { hat: '#101522', body: '#704d2c', accent: '#cf5e4d' }
     },
     {
         name: "ONE-EYE PETE",
-        bounty: "$1,000",
-        delayMs: 260,
+        bounty: "$1,200",
+        delayMs: 275,
         outfit: { hat: '#243654', body: '#4d6580', accent: '#79a67d' }
     },
     {
-        name: "DEADEYE DAN",
+        name: "BANDIT BILL",
+        bounty: "$1,800",
+        delayMs: 245,
+        outfit: { hat: '#181014', body: '#5c2420', accent: '#fce0a0' }
+    },
+    {
+        name: "SHADOW SETH",
         bounty: "$2,500",
-        delayMs: 200,
+        delayMs: 220,
+        outfit: { hat: '#14141c', body: '#2a3444', accent: '#a84c10' }
+    },
+    {
+        name: "DEADEYE DAN",
+        bounty: "$5,000",
+        delayMs: 195, // Sub-200ms quick-draw
         outfit: { hat: '#000000', body: '#242424', accent: '#d7a65f' }
+    },
+    {
+        name: "EL DIABLO",
+        bounty: "$10,000",
+        delayMs: 175, // Boss-tier lightning speed
+        outfit: { hat: '#3c0a0a', body: '#140404', accent: '#e02814' }
     }
 ];
 
+// In game.js
 function getOutlawForRound(round) {
     const index = (round - 1) % outlawRoster.length;
     const base = outlawRoster[index];
-    const speedBoost = Math.floor((round - 1) / outlawRoster.length) * 20;
+
+    // Each full pass through the roster shaves 15ms off reaction times
+    const loop = Math.floor((round - 1) / outlawRoster.length);
+    const speedBoost = loop * 15;
 
     return {
         ...base,
-        currentDelay: Math.max(120, base.delayMs - speedBoost)
+        // Floor at 110ms so human players still have a fighting chance
+        currentDelay: Math.max(110, base.delayMs - speedBoost)
     };
 }
 
