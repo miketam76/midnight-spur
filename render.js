@@ -584,6 +584,117 @@ function renderHogansBackground(ctx, width, height, tension, progress) {
     drawPixel(ctx, 0, groundY + 54, width, 10, snesPalette.streetDeep);
 }
 
+// --- SPECIAL BOSS SPRITE: "The Man With No Name" (Blondie) ---
+function drawBlondieCowboy(ctx, x, y, drawArmUp) {
+    const dir = -1; // Facing Left toward the Hero
+    const skinBase = '#f4b884';
+    const skinShadow = '#b86c40';
+    const hatColor = '#443020';
+    const hatLight = '#604430';
+    const ponchoGreen = '#3a4e32';
+    const ponchoLight = '#4d6842';
+    const whiteWeave = '#f4f0e0';
+    const denimBlue = '#243a5c';
+    const OL = snesPalette.outline;
+
+    ctx.save();
+    ctx.translate(Math.floor(x), Math.floor(y));
+
+    // Shadow
+    drawPixel(ctx, -24, 70, 48, 6, 'rgba(0, 0, 0, 0.45)');
+
+    // --- 1. SLOUCHED BROWN STETSON HAT ---
+    drawPixel(ctx, -30, -22, 60, 4, OL);
+    drawPixel(ctx, -28, -20, 56, 3, hatColor);
+    drawPixel(ctx, -26, -21, 52, 1, hatLight);
+
+    // Flat Slouched Crown
+    drawPixel(ctx, -16, -38, 32, 18, OL);
+    drawPixel(ctx, -14, -36, 28, 16, hatColor);
+    drawPixel(ctx, -14, -36, 28, 2, hatLight);
+    drawPixel(ctx, -14, -24, 28, 4, '#241810'); // Dark leather hatband
+
+    // --- 2. SQUINTING FACE, STUBBLE & CIGARILLO ---
+    drawPixel(ctx, -12, -17, 24, 23, OL);
+    drawPixel(ctx, -10, -15, 20, 19, skinBase);
+    drawPixel(ctx, -10, -3, 20, 5, skinShadow);
+
+    // Heavy 3-Day Beard Stubble (Dithered pixels)
+    drawPixel(ctx, -8, -4, 16, 6, '#885834');
+    drawPixel(ctx, -6, -2, 12, 4, '#583820');
+
+    // Iconic Razor Squint Eyes
+    const eyeX = dir * 4;
+    drawPixel(ctx, eyeX - 4, -12, 8, 2, OL);
+    drawPixel(ctx, eyeX - 4, -10, 7, 3, '#ffffff');
+    drawPixel(ctx, eyeX - 2, -10, 3, 3, OL);
+    drawPixel(ctx, eyeX - 2, -10, 1, 1, '#88c870'); // Hazel/Green eye glint
+
+    // Thin Cheroot Cigarillo Clamped in Mouth with Glowing Cherry Tip
+    drawPixel(ctx, eyeX - 10, -2, 7, 2, '#382010'); // Cigarillo body
+    drawPixel(ctx, eyeX - 12, -2, 2, 2, '#f84820'); // Glowing orange-red tip
+    drawPixel(ctx, eyeX - 13, -3, 1, 1, 'rgba(255, 255, 255, 0.6)'); // Smoke wisp
+
+    // --- 3. ICONIC OLIVE-GREEN WOOL SERAPE / PONCHO ---
+    drawPixel(ctx, -18, 6, 36, 34, OL);
+    drawPixel(ctx, -16, 8, 32, 30, ponchoGreen);
+    drawPixel(ctx, -16, 8, 10, 30, ponchoLight); // Left shoulder fold
+
+    // White Geometric Navajo / Serape Pattern Stripes
+    drawPixel(ctx, -16, 14, 32, 2, whiteWeave);
+    drawPixel(ctx, -16, 22, 32, 2, whiteWeave);
+    drawPixel(ctx, -12, 16, 4, 6, whiteWeave);
+    drawPixel(ctx, -2, 16, 4, 6, whiteWeave);
+    drawPixel(ctx, 8, 16, 4, 6, whiteWeave);
+
+    // Wool Fringe Bottom
+    for (let f = -16; f < 16; f += 4) {
+        drawPixel(ctx, f, 38, 2, 3, whiteWeave);
+    }
+
+    // Heavy Gunbelt Slung Low on Right Hip
+    drawPixel(ctx, -16, 35, 32, 6, '#381808');
+    drawPixel(ctx, 4, 34, 8, 7, '#fce0a0'); // Brass buckle
+
+    // --- 4. DENIM JEANS & COWBOY BOOTS ---
+    drawPixel(ctx, -14, 40, 12, 28, OL);
+    drawPixel(ctx, -12, 42, 8, 24, denimBlue);
+    drawPixel(ctx, 2, 40, 12, 28, OL);
+    drawPixel(ctx, 4, 42, 8, 24, '#14243c');
+
+    // Brown Distressed Riding Boots & Brass Spurs
+    drawPixel(ctx, -16, 62, 14, 8, OL);
+    drawPixel(ctx, -14, 64, 10, 6, '#381808');
+    drawPixel(ctx, 2, 62, 14, 8, OL);
+    drawPixel(ctx, 4, 64, 10, 6, '#381808');
+
+    // Brass Rowel Spur
+    drawPixel(ctx, 16, 64, 4, 4, '#fce0a0');
+
+    // --- 5. ARM & SINGLE-ACTION REVOLVER (Silver Snake Grip) ---
+    if (drawArmUp) {
+        drawPixel(ctx, dir * 12, 10, 22 * dir, 10, OL);
+        drawPixel(ctx, dir * 14, 12, 18 * dir, 6, ponchoGreen);
+        drawPixel(ctx, dir * 32, 11, 8 * dir, 7, skinBase);
+
+        // Peacemaker with Custom Silver Snake Inlay Grip
+        drawPixel(ctx, dir * 38, 4, 22 * dir, 9, OL);
+        drawPixel(ctx, dir * 40, 6, 18 * dir, 3, '#d0d0dc');
+        drawPixel(ctx, dir * 40, 5, 16 * dir, 1, '#ffffff');
+        drawPixel(ctx, dir * 38, 7, 7 * dir, 5, '#404048');
+        drawPixel(ctx, dir * 33, 10, 7 * dir, 8, '#2a1810'); // Dark walnut grip
+        drawPixel(ctx, dir * 34, 12, 3 * dir, 4, '#f0f0f8'); // Silver rattle snake inlay!
+    } else {
+        // Hand Tucked Ready by the Poncho Flap
+        drawPixel(ctx, dir * 12, 12, 10 * dir, 22, OL);
+        drawPixel(ctx, dir * 14, 14, 6 * dir, 18, ponchoGreen);
+        drawPixel(ctx, dir * 13, 30, 8 * dir, 8, skinBase);
+        drawPixel(ctx, dir * 17, 34, 8 * dir, 14, '#381808');
+    }
+
+    ctx.restore();
+}
+
 // Wanted Poster Screen
 function drawWantedPoster(ctx, width, height, outlaw) {
     const cardW = 320;

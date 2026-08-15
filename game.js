@@ -129,6 +129,14 @@ const outlawRoster = [
         bounty: "$100,000",
         delayMs: 130, // Extremely fast ~8-frame window
         outfit: { hat: '#08080c', body: '#141418', accent: '#c81818' }
+    },
+    // Final Grand Champion Boss (The Ultimate High-Noon Showdown)
+    {
+        name: "THE MAN WITH NO NAME",
+        bounty: "$250,000",
+        delayMs: 125, // True razor-edge ~7.5 frame boss reaction speed
+        isBlondie: true, // Flag for custom Eastwood sprite rendering
+        outfit: { hat: '#443020', body: '#3c4e32', accent: '#f4f0e0' }
     }
 ];
 
