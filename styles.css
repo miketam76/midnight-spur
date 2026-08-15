@@ -447,9 +447,12 @@ canvas {
 }
 
 /* Extra Tight Viewports / Small Displays (<= 400px) */
-@media (max-width: 400px) {
-    canvas {
-        max-height: 32vh;
+@media (max-width: 480px) {
+
+    canvas,
+    .canvas-container {
+        max-height: 48vh;
+        aspect-ratio: 4/3;
     }
 
     .hud-label {
