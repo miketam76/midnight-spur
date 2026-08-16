@@ -557,11 +557,24 @@ export function createGame(dom) {
         const elapsed = now - state.countdownStart;
         const timeUntilDraw = state.drawTime - now;
 
+        // Updated phase to use the improved audio tune
         if (state.phase === phases.countdown) {
             state.tension = clamp(elapsed / (state.countdownDuration * 1000), 0, 1);
             state.progress = state.tension;
             state.countdownProgress = clamp(1 - state.tension, 0, 1);
+
+            // Play periodic ticking clock cue that speeds up as DRAW approaches
+            if (!state.lastTickTime || now - state.lastTickTime > Math.max(180, 500 * (1 - state.tension))) {
+                state.lastTickTime = now;
+                audio.playTick(1.0 + state.tension * 0.5);
+            }
+
             state.phaseLabel = timeUntilDraw > 0 ? `DRAW IN ${Math.max(0, Math.ceil(timeUntilDraw / 1000))}` : 'DRAW';
+
+            // Cut music right before DRAW for tense silence
+            if (timeUntilDraw <= 350 && state.duelStartedAt === 0) {
+                audio.stopMusic();
+            }
 
             if (timeUntilDraw <= 0) {
                 state.phase = phases.duel;
@@ -573,7 +586,8 @@ export function createGame(dom) {
                 audio.playSignal();
                 syncControls();
             }
-        } else if (state.phase === phases.duel) {
+        }
+        else if (state.phase === phases.duel) {
             const duelElapsed = now - state.duelStartedAt;
             state.tension = 1;
             state.progress = 1;
