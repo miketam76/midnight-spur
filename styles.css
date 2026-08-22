@@ -65,6 +65,8 @@ body::before {
 }
 
 .screen--menu,
+.screen--scores,
+.screen--entry,
 .screen--result {
     padding: 24px;
 }
@@ -94,7 +96,6 @@ body::before {
 
 .eyebrow,
 .hud-label,
-.score-strip span,
 .result-stats span,
 .hint {
     text-transform: uppercase;
@@ -138,18 +139,6 @@ h2 {
     margin-top: 28px;
 }
 
-.score-strip {
-    display: inline-flex;
-    align-items: center;
-    gap: 14px;
-    margin-top: 24px;
-    padding: 12px 18px;
-    border-radius: 999px;
-    border: 1px solid rgba(244, 227, 193, 0.16);
-    background: rgba(7, 11, 20, 0.5);
-}
-
-.score-strip strong,
 .hud strong,
 .result-stats strong {
     font-family: "Press Start 2P", system-ui, sans-serif;
@@ -183,6 +172,7 @@ h2 {
     color: var(--paper);
     background: linear-gradient(180deg, rgba(36, 54, 84, 0.96), rgba(20, 30, 50, 0.96));
     border: 1px solid rgba(244, 227, 193, 0.18);
+    font-family: "Press Start 2P", system-ui, sans-serif;
 }
 
 .utility-button {
@@ -199,14 +189,16 @@ h2 {
 
 .primary-button:hover,
 .secondary-button:hover,
-.draw-button:hover {
+.draw-button:hover,
+.utility-button:hover {
     transform: translateY(-2px);
     filter: brightness(1.05);
 }
 
 .primary-button:active,
 .secondary-button:active,
-.draw-button:active {
+.draw-button:active,
+.utility-button:active {
     transform: translateY(4px);
 }
 
@@ -287,18 +279,24 @@ canvas {
     background: rgba(7, 11, 20, 0.82);
     border: 1px solid rgba(244, 227, 193, 0.14);
     border-radius: 999px;
-    padding: 10px 16px;
+    padding: 6px 16px;
     min-width: min(92vw, 420px);
     width: min(100%, 960px);
     margin: 0 auto;
     text-align: center;
+
+    /* Lock container height so text never pushes the layout */
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .status-banner p {
     margin: 0;
     font-family: "Press Start 2P", system-ui, sans-serif;
-    font-size: clamp(0.62rem, 1.8vw, 0.8rem);
-    line-height: 1.6;
+    font-size: clamp(0.58rem, 1.8vw, 0.75rem);
+    line-height: 1.4;
 }
 
 .controls {
@@ -347,7 +345,140 @@ canvas {
     margin-top: 10px;
 }
 
-/* Mobile Unified Portrait Single-Column Layout (<= 720px) */
+/* --- ARCADE ATTRACT MODE, HIGH SCORES & INITIALS STYLES --- */
+
+.arcade-insert-coin {
+    margin-top: 18px;
+    font-family: "Press Start 2P", monospace;
+    font-size: 0.72rem;
+    color: var(--accent);
+    letter-spacing: 0.12em;
+    animation: arcadeBlink 1s infinite steps(2, start);
+}
+
+@keyframes arcadeBlink {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+    }
+}
+
+.demo-marquee {
+    position: absolute;
+    top: 72px;
+    /* Clears the status banner and floats over the top of the canvas */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+    background: rgba(168, 44, 24, 0.92);
+    border: 2px solid #fce0a0;
+    color: #fce0a0;
+    font-family: "Press Start 2P", monospace;
+    font-size: 0.85rem;
+    padding: 6px 14px;
+    border-radius: 8px;
+    letter-spacing: 0.15em;
+    box-shadow: 0 0 14px rgba(224, 72, 16, 0.7);
+    pointer-events: none;
+    animation: arcadeBlink 0.8s infinite steps(2, start);
+}
+
+.scores-table {
+    display: grid;
+    gap: 10px;
+    margin: 24px 0 28px;
+    width: 100%;
+}
+
+.score-row {
+    display: grid;
+    grid-template-columns: 44px 100px 1fr;
+    align-items: center;
+    background: rgba(7, 11, 20, 0.75);
+    border: 1px solid rgba(244, 227, 193, 0.14);
+    border-radius: 12px;
+    padding: 14px 20px;
+    font-family: "Press Start 2P", monospace;
+    font-size: 0.85rem;
+}
+
+.score-rank {
+    color: var(--accent);
+}
+
+.score-initials {
+    color: #ffffff;
+    letter-spacing: 0.12em;
+}
+
+.score-bounty {
+    text-align: right;
+    color: #e4aa34;
+    font-size: 0.9rem;
+}
+
+.initials-input-container {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin: 28px 0;
+}
+
+.char-slot {
+    font-family: "Press Start 2P", monospace;
+    font-size: 2.2rem;
+    width: 64px;
+    height: 72px;
+    display: grid;
+    place-items: center;
+    background: rgba(8, 12, 22, 0.9);
+    border: 3px solid rgba(244, 227, 193, 0.2);
+    border-radius: 14px;
+    color: #f1e8cf;
+}
+
+.char-slot.is-selected {
+    border-color: var(--accent);
+    box-shadow: 0 0 16px rgba(215, 166, 95, 0.6);
+    color: var(--accent);
+    transform: translateY(-4px);
+    animation: slotPulse 0.9s infinite alternate ease-in-out;
+}
+
+@keyframes slotPulse {
+    from {
+        border-color: var(--accent);
+    }
+
+    to {
+        border-color: #ffffff;
+        color: #ffffff;
+    }
+}
+
+.entry-controls {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    width: min(100%, 360px);
+    margin: 0 auto;
+}
+
+.entry-controls .utility-button {
+    min-width: 64px;
+    font-size: 1.2rem;
+}
+
+.entry-controls .primary-button {
+    flex: 1;
+}
+
+/* Mobile Unified Portrait Layout (<= 720px) */
 @media (max-width: 720px) {
     .app-shell {
         padding: 8px;
@@ -446,13 +577,25 @@ canvas {
     }
 }
 
-/* Extra Tight Viewports / Small Displays (<= 400px) */
+/* Extra Tight Viewports (<= 480px) */
 @media (max-width: 480px) {
+    .status-banner {
+        width: 100%;
+        min-width: 0;
+        min-height: 46px;
+        /* Holds 2 full lines of retro text comfortably */
+        padding: 4px 10px;
+    }
+
+    .status-banner p {
+        font-size: 0.58rem;
+        line-height: 1.35;
+    }
 
     canvas,
     .canvas-container {
         max-height: 48vh;
-        aspect-ratio: 4/3;
+        aspect-ratio: 4 / 3;
     }
 
     .hud-label {
@@ -471,6 +614,28 @@ canvas {
     .draw-button {
         min-height: 56px;
         font-size: 0.9rem;
+    }
+
+    .score-row {
+        grid-template-columns: 32px 70px 1fr;
+        font-size: 0.68rem;
+        padding: 10px 12px;
+    }
+
+    .score-bounty {
+        font-size: 0.72rem;
+    }
+
+    .char-slot {
+        width: 52px;
+        height: 60px;
+        font-size: 1.6rem;
+    }
+
+    .demo-marquee {
+        top: 64px;
+        font-size: 0.70rem;
+        padding: 4px 10px;
     }
 }
 

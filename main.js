@@ -5,8 +5,12 @@ const dom = {
     menuScreen: document.getElementById('menuScreen'),
     gameScreen: document.getElementById('gameScreen'),
     resultScreen: document.getElementById('resultScreen'),
+    scoresScreen: document.getElementById('scoresScreen'),
+    entryScreen: document.getElementById('entryScreen'),
+    demoMarquee: document.getElementById('demoMarquee'),
     startButton: document.getElementById('startButton'),
     scoresButton: document.getElementById('scoresButton'),
+    scoresBackButton: document.getElementById('scoresBackButton'),
     playAgainButton: document.getElementById('playAgainButton'),
     backToMenuButton: document.getElementById('backToMenuButton'),
     drawButton: document.getElementById('drawButton'),
@@ -15,7 +19,6 @@ const dom = {
     roundValue: document.getElementById('roundValue'),
     winsValue: document.getElementById('winsValue'),
     bestValue: document.getElementById('bestValue'),
-    bestWins: document.getElementById('bestWins'),
     finalWins: document.getElementById('finalWins'),
     finalBest: document.getElementById('finalBest'),
     resultBadge: document.getElementById('resultBadge'),
@@ -24,65 +27,56 @@ const dom = {
     pauseButton: document.getElementById('pauseButton'),
     muteButton: document.getElementById('muteButton'),
     exitButton: document.getElementById('exitButton'),
+    scoresTable: document.getElementById('scoresTable'),
+    charSlot0: document.getElementById('charSlot0'),
+    charSlot1: document.getElementById('charSlot1'),
+    charSlot2: document.getElementById('charSlot2'),
+    prevCharBtn: document.getElementById('prevCharBtn'),
+    nextCharBtn: document.getElementById('nextCharBtn'),
+    confirmCharBtn: document.getElementById('confirmCharBtn'),
 };
 
 const game = createGame(dom);
 game.boot();
 
-function scrollToGame() {
-    document.querySelector('.screen--game')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
+// Start & Menu Handlers
+dom.startButton.addEventListener('click', () => game.startRound());
+dom.scoresButton.addEventListener('click', () => game.showHighScores());
+dom.scoresBackButton?.addEventListener('click', () => game.startMenu(true));
+dom.playAgainButton.addEventListener('click', () => game.startRound());
+dom.backToMenuButton?.addEventListener('click', () => game.startMenu(true));
+dom.exitButton?.addEventListener('click', () => game.startMenu(true));
+dom.drawButton.addEventListener('click', () => game.onDraw());
 
-dom.startButton.addEventListener('click', () => {
-    game.startRound();
-    scrollToGame();
-});
+// Initials Entry Controls
+dom.prevCharBtn?.addEventListener('click', () => game.cycleInitials(-1));
+dom.nextCharBtn?.addEventListener('click', () => game.cycleInitials(1));
+dom.confirmCharBtn?.addEventListener('click', () => game.confirmInitialSlot());
 
-dom.drawButton.addEventListener('click', () => {
-    game.onDraw();
-});
-
-dom.pauseButton.addEventListener('click', () => {
-    const isPaused = game.togglePause();
-    dom.pauseButton.textContent = isPaused ? 'Resume' : 'Pause';
-    dom.drawButton.disabled = isPaused;
-});
-
+// Utility Buttons
+dom.pauseButton.addEventListener('click', () => game.togglePause());
 dom.muteButton.addEventListener('click', () => {
     const isMuted = game.toggleMute();
     dom.muteButton.textContent = isMuted ? 'Unmute' : 'Mute';
 });
 
-dom.playAgainButton.addEventListener('click', () => {
-    game.startRound();
-    scrollToGame();
+// Any pointer click or touch during Attract Demo or Scores interrupts and returns to Title
+window.addEventListener('pointerdown', (e) => {
+    if (!e.target.closest('button')) {
+        game.handleAttractInterrupt();
+    }
 });
 
-dom.backToMenuButton?.addEventListener('click', () => {
-    game.startMenu();
-});
-
-dom.exitButton?.addEventListener('click', () => {
-    game.startMenu();
-});
-
-dom.scoresButton.addEventListener('click', () => {
-    dom.resultBadge.textContent = 'High Scores';
-    dom.resultTitle.textContent = 'Best Wins';
-    dom.resultMessage.textContent = `Your best local streak is ${dom.bestWins.textContent}.`;
-    dom.finalWins.textContent = dom.bestWins.textContent;
-    dom.finalBest.textContent = dom.bestWins.textContent;
-    dom.menuScreen.hidden = true;
-    dom.gameScreen.hidden = true;
-    dom.resultScreen.hidden = false;
-});
-
+// Keyboard Navigation & Shortcuts
 window.addEventListener('keydown', (event) => {
+    if (game.handleAttractInterrupt()) {
+        event.preventDefault();
+        return;
+    }
+
     if (event.code === 'KeyP') {
         event.preventDefault();
-        const isPaused = game.togglePause();
-        dom.pauseButton.textContent = isPaused ? 'Resume' : 'Pause';
-        dom.drawButton.disabled = isPaused;
+        game.togglePause();
         return;
     }
 
@@ -93,9 +87,18 @@ window.addEventListener('keydown', (event) => {
         return;
     }
 
+    if (event.code === 'ArrowLeft' || event.code === 'KeyA') {
+        game.cycleInitials(-1);
+    } else if (event.code === 'ArrowRight' || event.code === 'KeyD') {
+        game.cycleInitials(1);
+    }
+
     if (event.code === 'Space' || event.code === 'Enter') {
-        if (game.isPaused()) return;
         event.preventDefault();
-        game.onDraw();
+        if (dom.entryScreen && !dom.entryScreen.hidden) {
+            game.confirmInitialSlot();
+        } else {
+            game.onDraw();
+        }
     }
 });
