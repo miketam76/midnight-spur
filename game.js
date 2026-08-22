@@ -194,6 +194,15 @@ export function createGame(dom) {
         syncControls();
     }
 
+    function restartGame() {
+        clearAttractTimer();
+        state.round = 1;
+        state.wins = 0;
+        state.totalBountyEarned = 0;
+        syncHud();
+        startRound();
+    }
+
     function setStatus(message) {
         state.baseStatus = message;
         dom.statusText.textContent = message;
@@ -301,6 +310,7 @@ export function createGame(dom) {
     }
 
     function resolveEarlyDraw() {
+        state.phase = phases.gameOver;
         audio.stopMusic();
         state.playerHasDrawn = true;
         state.phaseLabel = 'TOO EARLY';
@@ -313,9 +323,10 @@ export function createGame(dom) {
     }
 
     function resolveVictory(drawTimeMs) {
+        state.phase = phases.roundWin;
         audio.stopMusic();
         state.playerHasDrawn = true;
-        state.opponentHasDrawn = true;
+        state.opponentHasDrawn = false;
         state.phaseLabel = 'BANG';
         state.opponentDeathProgress = 0.035;
         state.muzzleFlash.player = 6;
@@ -332,8 +343,10 @@ export function createGame(dom) {
     }
 
     function resolveLoss() {
+        state.phase = phases.gameOver;
         audio.stopMusic();
         state.opponentHasDrawn = true;
+        state.playerHasDrawn = false;
         state.phaseLabel = 'HIT';
         state.playerDeathProgress = 0.035;
         state.muzzleFlash.opponent = 6;
@@ -546,6 +559,7 @@ export function createGame(dom) {
         boot,
         startMenu,
         startRound,
+        restartGame,
         showHighScores,
         onDraw,
         handleAttractInterrupt,

@@ -43,7 +43,7 @@ game.boot();
 dom.startButton.addEventListener('click', () => game.startRound());
 dom.scoresButton.addEventListener('click', () => game.showHighScores());
 dom.scoresBackButton?.addEventListener('click', () => game.startMenu(true));
-dom.playAgainButton.addEventListener('click', () => game.startRound());
+dom.playAgainButton.addEventListener('click', () => game.restartGame());
 dom.backToMenuButton?.addEventListener('click', () => game.startMenu(true));
 dom.exitButton?.addEventListener('click', () => game.startMenu(true));
 dom.drawButton.addEventListener('click', () => game.onDraw());
