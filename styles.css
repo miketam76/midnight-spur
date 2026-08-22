@@ -239,6 +239,10 @@ h2 {
     text-align: center;
 }
 
+#bountyValue {
+    color: #e4aa34;
+}
+
 .arena-frame {
     width: min(100%, 1180px);
     grid-column: 1;

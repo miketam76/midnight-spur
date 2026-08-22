@@ -156,6 +156,7 @@ export function createGame(dom) {
 
     function syncHud() {
         if (dom.roundValue) dom.roundValue.textContent = String(state.round);
+        if (dom.bountyValue) dom.bountyValue.textContent = '$' + Number(state.totalBountyEarned || 0).toLocaleString();
         if (dom.winsValue) dom.winsValue.textContent = String(state.wins);
         if (dom.bestValue) dom.bestValue.textContent = String(state.bestWins);
     }

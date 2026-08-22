@@ -17,6 +17,7 @@ const dom = {
     canvas: document.getElementById('gameCanvas'),
     statusText: document.getElementById('statusText'),
     roundValue: document.getElementById('roundValue'),
+    bountyValue: document.getElementById('bountyValue'),
     winsValue: document.getElementById('winsValue'),
     bestValue: document.getElementById('bestValue'),
     finalWins: document.getElementById('finalWins'),
