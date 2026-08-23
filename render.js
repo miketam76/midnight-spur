@@ -1,4 +1,4 @@
-// render.js - Midnight Spur (Option B: Full-Scale Imposing Town Standoff)
+// render.js - Midnight Spur (Option B: Full-Scale Imposing Town Standoff + Progressive 3-Tier Sky)
 
 const snesPalette = {
     skyTop: '#0a0d1a',
@@ -12,6 +12,52 @@ const snesPalette = {
     streetDeep: '#6c3810',
     outline: '#000000',
 };
+
+// 3-Tier Sky Engine Palettes
+const skyTiers = {
+    // Tier 1: Midday Frontier Blue (Rounds 1 - 5)
+    day: {
+        top: '#1b3b6f',
+        upper: '#3a699c',
+        mid: '#6495c2',
+        horizon: '#d4aa7d',
+        hasStars: false,
+    },
+    // Tier 2: Fiery Sunset (Rounds 6 - 12)
+    sunset: {
+        top: '#241424',
+        upper: '#5c1e28',
+        mid: '#9e381c',
+        horizon: '#e07824',
+        hasStars: false,
+    },
+    // Tier 3: Midnight Starlight (Rounds 13 - 19)
+    night: {
+        top: '#05070e',
+        upper: '#0d1322',
+        mid: '#1a182c',
+        horizon: '#442220',
+        hasStars: true,
+    }
+};
+
+const fixedStars = [
+    { x: 0.12, y: 0.08, size: 2 },
+    { x: 0.24, y: 0.16, size: 1 },
+    { x: 0.38, y: 0.06, size: 2 },
+    { x: 0.49, y: 0.22, size: 1 },
+    { x: 0.62, y: 0.11, size: 2 },
+    { x: 0.74, y: 0.05, size: 1 },
+    { x: 0.85, y: 0.18, size: 2 },
+    { x: 0.92, y: 0.09, size: 1 },
+    { x: 0.05, y: 0.25, size: 1 },
+];
+
+function getSkyForRound(round = 1) {
+    if (round <= 5) return skyTiers.day;
+    if (round <= 12) return skyTiers.sunset;
+    return skyTiers.night;
+}
 
 const nesPalette = snesPalette;
 
@@ -463,14 +509,22 @@ function drawHogansFallenCowboy(ctx, x, y, outfit, facingLeft, progress) {
 }
 
 // --- OPTION B: FULL-SCALE 2-STORY PROPORTIONAL WESTERN TOWN ---
-function renderHogansBackground(ctx, width, height, tension, progress) {
+function renderHogansBackground(ctx, width, height, round = 1) {
     const skySplit = Math.floor(height * 0.52);
+    const sky = getSkyForRound(round);
 
-    // Dynamic Sunset Sky Gradient
-    drawPixel(ctx, 0, 0, width, skySplit * 0.30, snesPalette.skyTop);
-    drawPixel(ctx, 0, skySplit * 0.30, width, skySplit * 0.25, snesPalette.skyUpper);
-    drawPixel(ctx, 0, skySplit * 0.55, width, skySplit * 0.22, snesPalette.skyMid);
-    drawPixel(ctx, 0, skySplit * 0.77, width, skySplit * 0.23, snesPalette.skyHorizon);
+    // 1. Progressive Sky Gradient
+    drawPixel(ctx, 0, 0, width, skySplit * 0.30, sky.top);
+    drawPixel(ctx, 0, skySplit * 0.30, width, skySplit * 0.25, sky.upper);
+    drawPixel(ctx, 0, skySplit * 0.55, width, skySplit * 0.22, sky.mid);
+    drawPixel(ctx, 0, skySplit * 0.77, width, skySplit * 0.23, sky.horizon);
+
+    // Night Sky Twinkling Stars (Tier 3)
+    if (sky.hasStars) {
+        fixedStars.forEach((star) => {
+            drawPixel(ctx, width * star.x, skySplit * star.y, star.size, star.size, '#ffffff');
+        });
+    }
 
     const groundY = skySplit - 6;
 
@@ -868,7 +922,7 @@ export function createRenderer(canvas) {
             context.translate(Math.floor(shakeX), Math.floor(shakeY));
 
             if (state.phase === 'wanted') {
-                renderHogansBackground(context, width, height, 0, 0);
+                renderHogansBackground(context, width, height, state.round);
                 drawWantedPoster(context, width, height, state.currentOutlaw);
                 context.restore();
                 return;
@@ -887,7 +941,7 @@ export function createRenderer(canvas) {
                 context.translate(-focalX, -focalY);
             }
 
-            renderHogansBackground(context, width, height, state.tension, state.progress);
+            renderHogansBackground(context, width, height, state.round);
 
             // Tumbleweed
             if (state.tumbleweed && state.tumbleweed.active) {
