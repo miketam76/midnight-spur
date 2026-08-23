@@ -106,9 +106,12 @@ function drawTumbleweed(ctx, tw) {
 function drawHeroVanCleef(ctx, x, y, drawArmUp) {
     const skinBase = '#f4b884';
     const skinShadow = '#b86c40';
-    const hatLight = '#ede6d6';
-    const hatMid = '#d2c4b0';
-    const hatShadow = '#9a8a76';
+
+    // Midnight Black Hat Palette
+    const hatLight = '#343844';
+    const hatMid = '#1c202a';
+    const hatShadow = '#0c1018';
+
     const darkVest = '#202028';
     const silver = '#d0d0dc';
     const OL = snesPalette.outline;
@@ -897,7 +900,7 @@ export function createRenderer(canvas) {
 
             // Player Render
             if (state.playerDeathProgress > 0) {
-                drawHogansFallenCowboy(context, playerX, cowboyY, { hat: '#ede6d6', body: '#202028' }, false, state.playerDeathProgress);
+                drawHogansFallenCowboy(context, playerX, cowboyY, { hat: '#1c202a', body: '#202028' }, false, state.playerDeathProgress);
             } else {
                 drawHeroVanCleef(context, playerX, cowboyY, state.playerHasDrawn);
             }

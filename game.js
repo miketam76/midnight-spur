@@ -267,6 +267,7 @@ export function createGame(dom) {
         state.isDemo = false;
         audio.unlock();
         audio.stopMusic();
+        audio.playCylinderSpin();
 
         state.currentOutlaw = getOutlawForRound(state.round);
         state.opponentOutfit = state.currentOutlaw.outfit;

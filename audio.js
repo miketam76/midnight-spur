@@ -50,6 +50,7 @@ function scheduleNoiseBurst(context, startTime, duration, gainValue) {
     source.stop(startTime + duration + 0.02);
 }
 
+
 // Authentic Peacemaker Shot with Layered Ricochet Whine
 function playPeacemakerShot(context, startTime, withRicochet = false) {
     // 1. Rapid Pitch-Dive Pulse Wave (Pistol Body)
@@ -314,6 +315,17 @@ export function createAudioSystem() {
             scheduleTone(ctx, 311.13, now + 0.06, 0.16, 'sawtooth', 0.05, -30); // Eb
             scheduleTone(ctx, 293.66, now + 0.18, 0.22, 'sawtooth', 0.05, -45); // D
             scheduleTone(ctx, 146.83, now + 0.32, 0.38, 'sawtooth', 0.06, -60); // Low D drop
+        },
+        playCylinderSpin() {
+            if (muted) return;
+            const ctx = ensureContext();
+            if (!ctx) return;
+            const now = ctx.currentTime;
+            for (let i = 0; i < 6; i++) {
+                const clickTime = now + i * 0.042;
+                scheduleTone(ctx, 1600 + i * 120, clickTime, 0.012, 'square', 0.035);
+                scheduleNoiseBurst(ctx, clickTime, 0.008, 0.03);
+            }
         },
     };
 }
