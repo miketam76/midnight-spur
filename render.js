@@ -118,32 +118,83 @@ function drawMuzzleBlast(ctx, x, y, facingLeft, flashFrame) {
     ctx.restore();
 }
 
-// Rolling 8-Bit Pixel Tumbleweed
 function drawTumbleweed(ctx, tw) {
     if (!tw || !tw.active) return;
 
     ctx.save();
     const drawY = tw.currentY !== undefined ? tw.currentY : tw.y;
     ctx.translate(Math.floor(tw.x), Math.floor(drawY));
+
+    // 1. Draw flat ground shadow BEFORE rotating
+    drawPixel(ctx, -14, 15, 28, 4, 'rgba(0, 0, 0, 0.35)');
+
+    // 2. Rotate ONLY the spinning tumbleweed branches
     ctx.rotate(tw.rotation || 0);
 
-    drawPixel(ctx, -7, 10, 14, 3, 'rgba(0, 0, 0, 0.25)');
+    const cShadow = '#2d180c';
+    const cDeep = '#543015';
+    const cMid = '#8c5828';
+    const cStraw = '#c98e46';
+    const cTip = '#f4cf82';
 
-    const strawDark = '#6e4822';
-    const strawMid = '#a4743c';
-    const strawLight = '#d49c58';
+    // Dense Shadow Core
+    drawPixel(ctx, -7, -7, 14, 14, cShadow);
+    drawPixel(ctx, -5, -5, 10, 10, cDeep);
 
-    drawPixel(ctx, -8, -8, 16, 16, strawDark);
-    drawPixel(ctx, -6, -6, 12, 12, strawMid);
-    drawPixel(ctx, -4, -4, 8, 8, strawLight);
+    // Tangled outer twigs & briars
+    drawPixel(ctx, -12, -8, 2, 16, cDeep);
+    drawPixel(ctx, 10, -8, 2, 16, cDeep);
+    drawPixel(ctx, -8, -12, 16, 2, cDeep);
+    drawPixel(ctx, -8, 10, 16, 2, cDeep);
 
-    drawPixel(ctx, -10, -2, 3, 4, strawDark);
-    drawPixel(ctx, 7, -2, 3, 4, strawDark);
-    drawPixel(ctx, -2, -10, 4, 3, strawDark);
-    drawPixel(ctx, -2, 7, 4, 3, strawDark);
+    drawPixel(ctx, -14, -4, 4, 3, cMid);
+    drawPixel(ctx, 10, 1, 4, 3, cMid);
+    drawPixel(ctx, -4, -14, 3, 4, cMid);
+    drawPixel(ctx, 1, 10, 3, 4, cMid);
 
-    drawPixel(ctx, -6, 2, 4, 2, strawMid);
-    drawPixel(ctx, 2, -6, 2, 4, strawLight);
+    drawPixel(ctx, -11, -11, 4, 4, cDeep);
+    drawPixel(ctx, 7, -11, 4, 4, cDeep);
+    drawPixel(ctx, -11, 7, 4, 4, cDeep);
+    drawPixel(ctx, 7, 7, 4, 4, cDeep);
+
+    // Main sweeping straw strands
+    drawPixel(ctx, -9, -5, 18, 2, cStraw);
+    drawPixel(ctx, -9, 3, 18, 2, cStraw);
+    drawPixel(ctx, -5, -9, 2, 18, cStraw);
+    drawPixel(ctx, 3, -9, 2, 18, cStraw);
+
+    drawPixel(ctx, -8, -8, 5, 2, cStraw);
+    drawPixel(ctx, -3, -6, 6, 2, cTip);
+    drawPixel(ctx, 3, -4, 5, 2, cStraw);
+
+    drawPixel(ctx, -7, 5, 5, 2, cStraw);
+    drawPixel(ctx, -2, 3, 6, 2, cTip);
+    drawPixel(ctx, 4, 1, 4, 2, cStraw);
+
+    // Looping fibers
+    drawPixel(ctx, -6, -8, 2, 5, cTip);
+    drawPixel(ctx, -4, -3, 2, 6, cStraw);
+    drawPixel(ctx, -2, 3, 2, 5, cDeep);
+
+    drawPixel(ctx, 5, -7, 2, 5, cStraw);
+    drawPixel(ctx, 3, -2, 2, 6, cTip);
+    drawPixel(ctx, 1, 4, 2, 4, cDeep);
+
+    // Loose fringe tips
+    drawPixel(ctx, -15, -7, 3, 2, cTip);
+    drawPixel(ctx, -14, 6, 3, 2, cStraw);
+    drawPixel(ctx, 12, -6, 3, 2, cTip);
+    drawPixel(ctx, 11, 7, 3, 2, cStraw);
+
+    drawPixel(ctx, -7, -15, 2, 3, cTip);
+    drawPixel(ctx, 6, -14, 2, 3, cStraw);
+    drawPixel(ctx, -6, 12, 2, 3, cStraw);
+    drawPixel(ctx, 5, 11, 2, 3, cTip);
+
+    // Light glints
+    drawPixel(ctx, -3, -3, 3, 2, cTip);
+    drawPixel(ctx, 1, 1, 3, 2, cTip);
+    drawPixel(ctx, -1, 0, 2, 2, '#fff0c0');
 
     ctx.restore();
 }

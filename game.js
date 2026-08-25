@@ -112,24 +112,39 @@ export function createGame(dom) {
     function updateTumbleweed() {
         const tw = state.tumbleweed;
         if (!tw) return;
+
+        const isLateGame = state.round > 12;
+        const isMidGame = state.round > 5;
+
         if (!tw.active) {
             tw.timer--;
             if (tw.timer <= 0) {
                 tw.active = true;
-                tw.x = -30;
-                tw.y = Math.floor(canvas.height * 0.76) + Math.random() * 16;
-                tw.vx = 1.4 + Math.random() * 1.0;
+                tw.x = -40;
+                tw.y = Math.floor(canvas.height * 0.76) + Math.random() * 12;
+
+                // Speed scales up in Sunset (Tier 2) and Night (Tier 3)
+                const baseSpeed = 1.6 + Math.random() * 1.0;
+                tw.vx = baseSpeed * (isLateGame ? 1.5 : (isMidGame ? 1.25 : 1.0));
+
                 tw.rotation = 0;
                 tw.bouncePhase = 0;
             }
         } else {
             tw.x += tw.vx;
-            tw.rotation += 0.08;
-            tw.bouncePhase += 0.06;
-            tw.currentY = tw.y - Math.abs(Math.sin(tw.bouncePhase) * 7);
-            if (tw.x > canvas.width + 40) {
+            tw.rotation += 0.07 * (tw.vx / 1.6);
+            tw.bouncePhase += 0.055;
+
+            // Scaled bounce arc height for the larger mass
+            tw.currentY = tw.y - Math.abs(Math.sin(tw.bouncePhase) * 11);
+
+            if (tw.x > canvas.width + 50) {
                 tw.active = false;
-                tw.timer = 180 + Math.floor(Math.random() * 240);
+
+                // Tighter delay between tumbleweeds in later rounds
+                const minDelay = isLateGame ? 60 : (isMidGame ? 110 : 180);
+                const variance = isLateGame ? 80 : 160;
+                tw.timer = minDelay + Math.floor(Math.random() * variance);
             }
         }
     }
