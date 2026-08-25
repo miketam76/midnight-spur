@@ -92,6 +92,13 @@ export function createGame(dom) {
         currentOutlaw: outlawRoster[0],
         playerDeathProgress: 0,
         opponentDeathProgress: 0,
+        dustParticles: Array.from({ length: 18 }, () => ({
+            x: Math.random() * 800,
+            y: 200 + Math.random() * 200,
+            size: Math.random() > 0.6 ? 2 : 1,
+            speed: 1.5 + Math.random() * 2.5,
+            alpha: 0.2 + Math.random() * 0.4
+        })),
         screenShake: 0,
         baseStatus: 'Choose Start Game to face the outlaw.',
         pendingTransition: null,
@@ -107,6 +114,19 @@ export function createGame(dom) {
 
     function isActivePhase() {
         return state.phase === phases.countdown || state.phase === phases.duel || state.phase === phases.roundWin;
+    }
+
+    function updateDust() {
+        if (!state.dustParticles) return;
+        const tierMultiplier = state.round > 12 ? 1.8 : (state.round > 5 ? 1.3 : 1.0);
+
+        state.dustParticles.forEach((p) => {
+            p.x += p.speed * tierMultiplier;
+            if (p.x > canvas.width + 10) {
+                p.x = -10;
+                p.y = canvas.height * 0.45 + Math.random() * (canvas.height * 0.50);
+            }
+        });
     }
 
     function updateTumbleweed() {
@@ -514,6 +534,7 @@ export function createGame(dom) {
             state.opponentDeathProgress = clamp(state.opponentDeathProgress + 0.035, 0, 1);
         }
 
+        updateDust();
         updateTumbleweed();
 
         if (state.pendingTransition && now >= state.pendingTransitionAt) {

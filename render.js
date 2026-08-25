@@ -1,4 +1,4 @@
-// render.js - Midnight Spur (Option B: Full-Scale Imposing Town Standoff + Progressive 3-Tier Sky)
+// render.js - Midnight Spur (Option B: Full-Scale Imposing Town Standoff, Dynamic Sky & Dust FX)
 
 const snesPalette = {
     skyTop: '#0a0d1a',
@@ -59,8 +59,6 @@ function getSkyForRound(round = 1) {
     return skyTiers.night;
 }
 
-const nesPalette = snesPalette;
-
 function drawPixel(ctx, x, y, width, height, color) {
     ctx.fillStyle = color;
     ctx.fillRect(Math.floor(x), Math.floor(y), Math.floor(width), Math.floor(height));
@@ -118,6 +116,18 @@ function drawMuzzleBlast(ctx, x, y, facingLeft, flashFrame) {
     ctx.restore();
 }
 
+// Wind-blown atmospheric dust particles
+function drawDustParticles(ctx, particles, round = 1) {
+    if (!particles) return;
+    const dustColor = round > 12 ? 'rgba(210, 190, 180, ' : 'rgba(230, 185, 130, ';
+
+    particles.forEach((p) => {
+        ctx.fillStyle = `${dustColor}${p.alpha})`;
+        ctx.fillRect(Math.floor(p.x), Math.floor(p.y), p.size * 2, p.size);
+    });
+}
+
+// Bushy Dried-Grass / Briar Tumbleweed (~32px)
 function drawTumbleweed(ctx, tw) {
     if (!tw || !tw.active) return;
 
@@ -582,24 +592,21 @@ function renderHogansBackground(ctx, width, height, round = 1) {
     // 1. SALOON (2-Story False-Front Architecture)
     const saloonX = 4;
     const saloonW = 164;
-    const saloonH = 240; // Imposing 2-story height
+    const saloonH = 240;
     const saloonY = groundY - saloonH + 10;
 
     drawPixel(ctx, saloonX, saloonY, saloonW, saloonH, snesPalette.outline);
     drawPixel(ctx, saloonX + 2, saloonY + 2, saloonW - 4, saloonH - 4, '#7c2814');
 
-    // Horizontal clapboard siding lines
     for (let row = saloonY + 4; row < groundY + 6; row += 8) {
         drawPixel(ctx, saloonX + 4, row, saloonW - 8, 1, '#581c0e');
     }
 
-    // False-Front Parapet Roof Pediment
     drawPixel(ctx, saloonX + 8, saloonY - 20, saloonW - 16, 20, snesPalette.outline);
     drawPixel(ctx, saloonX + 10, saloonY - 18, saloonW - 20, 16, '#581c0e');
     drawPixel(ctx, saloonX + 30, saloonY - 30, saloonW - 60, 12, snesPalette.outline);
     drawPixel(ctx, saloonX + 32, saloonY - 28, saloonW - 64, 10, '#7c2814');
 
-    // Elevated SALOON Signboard
     const sSignX = saloonX + 16;
     const sSignY = saloonY + 8;
     const sSignW = 132;
@@ -614,7 +621,6 @@ function renderHogansBackground(ctx, width, height, round = 1) {
     ctx.textAlign = 'center';
     ctx.fillText("SALOON", sSignX + sSignW / 2, sSignY + 18);
 
-    // 2nd Story Windows (Upper Floor)
     [saloonX + 16, saloonX + 66, saloonX + 116].forEach((winX) => {
         drawPixel(ctx, winX - 2, saloonY + 46, 32, 34, snesPalette.outline);
         drawPixel(ctx, winX, saloonY + 48, 28, 30, '#100c14');
@@ -623,13 +629,11 @@ function renderHogansBackground(ctx, width, height, round = 1) {
         drawPixel(ctx, winX + 12, saloonY + 48, 4, 30, '#581c0e');
     });
 
-    // 1st Story Covered Porch & Balcony Overhang
     drawPixel(ctx, saloonX - 4, saloonY + 98, saloonW + 8, 10, snesPalette.outline);
     drawPixel(ctx, saloonX - 2, saloonY + 100, saloonW + 4, 6, '#582410');
     drawPixel(ctx, saloonX + 6, saloonY + 108, 6, 126, snesPalette.outline);
     drawPixel(ctx, saloonX + 152, saloonY + 108, 6, 126, snesPalette.outline);
 
-    // Lower Ground Floor Windows
     [saloonX + 14, saloonX + 116].forEach((winX) => {
         drawPixel(ctx, winX - 2, saloonY + 124, 34, 40, snesPalette.outline);
         drawPixel(ctx, winX, saloonY + 126, 30, 36, '#100c14');
@@ -637,18 +641,16 @@ function renderHogansBackground(ctx, width, height, round = 1) {
         drawPixel(ctx, winX + 20, saloonY + 128, 8, 32, '#a82c18');
     });
 
-    // Realistic Full-Scale Double Batwing Swinging Doors
     const sDoorX = saloonX + 60;
     const sDoorY = saloonY + 122;
     drawPixel(ctx, sDoorX - 4, sDoorY - 4, 44, 114, snesPalette.outline);
     drawPixel(ctx, sDoorX - 2, sDoorY - 2, 40, 112, '#140c0a');
-    // Swinging Half-Doors (Chest Height to Knees)
     drawPixel(ctx, sDoorX, sDoorY + 36, 17, 50, '#884414');
     drawPixel(ctx, sDoorX + 19, sDoorY + 36, 17, 50, '#884414');
     drawPixel(ctx, sDoorX + 2, sDoorY + 40, 13, 42, '#58280e');
     drawPixel(ctx, sDoorX + 21, sDoorY + 40, 13, 42, '#58280e');
 
-    // 2. SHERIFF'S OFFICE & JAIL (Tall Heavy Timber Post)
+    // 2. SHERIFF'S OFFICE & JAIL
     const sheriffX = 172;
     const sheriffW = 144;
     const sheriffH = 205;
@@ -661,7 +663,6 @@ function renderHogansBackground(ctx, width, height, round = 1) {
         drawPixel(ctx, sheriffX + 2, row, sheriffW - 4, 1, '#3a2012');
     }
 
-    // Heavy Timber Overhanging Cornice
     drawPixel(ctx, sheriffX - 4, sheriffY - 14, sheriffW + 8, 14, snesPalette.outline);
     drawPixel(ctx, sheriffX - 2, sheriffY - 12, sheriffW + 4, 10, '#3a2012');
 
@@ -681,34 +682,30 @@ function renderHogansBackground(ctx, width, height, round = 1) {
     ctx.font = '10px "Press Start 2P", monospace';
     ctx.fillText("SHERIFF", shSignX + 68, shSignY + 15);
 
-    // Upper Office Window
     drawPixel(ctx, sheriffX + 54, sheriffY + 46, 36, 32, snesPalette.outline);
     drawPixel(ctx, sheriffX + 56, sheriffY + 48, 32, 28, '#181014');
     drawPixel(ctx, sheriffX + 70, sheriffY + 48, 4, 28, '#3a2012');
 
-    // Reinforced Iron Bar Jail Windows
     [sheriffX + 12, sheriffX + 98].forEach((jailWinX) => {
         const jailWinY = sheriffY + 106;
         drawPixel(ctx, jailWinX - 2, jailWinY - 2, 34, 46, snesPalette.outline);
         drawPixel(ctx, jailWinX, jailWinY, 30, 42, '#181014');
-        drawPixel(ctx, jailWinX + 8, jailWinY + 14, 4, 4, '#fcb070'); // Prisoner silhouette eyes
+        drawPixel(ctx, jailWinX + 8, jailWinY + 14, 4, 4, '#fcb070');
         drawPixel(ctx, jailWinX + 18, jailWinY + 14, 4, 4, '#fcb070');
-        // Heavy Iron Bars
         drawPixel(ctx, jailWinX + 6, jailWinY, 3, 42, '#888888');
         drawPixel(ctx, jailWinX + 14, jailWinY, 3, 42, '#888888');
         drawPixel(ctx, jailWinX + 22, jailWinY, 3, 42, '#888888');
     });
 
-    // Solid Oak Office Door
     const shDoorX = sheriffX + 54;
     const shDoorY = sheriffY + 104;
     drawPixel(ctx, shDoorX - 2, shDoorY - 2, 36, 101, snesPalette.outline);
     drawPixel(ctx, shDoorX, shDoorY, 32, 99, '#3a2012');
     drawPixel(ctx, shDoorX + 4, shDoorY + 6, 24, 40, '#28140a');
     drawPixel(ctx, shDoorX + 4, shDoorY + 52, 24, 42, '#28140a');
-    drawPixel(ctx, shDoorX + 24, shDoorY + 48, 4, 4, '#fce0a0'); // Brass knob
+    drawPixel(ctx, shDoorX + 24, shDoorY + 48, 4, 4, '#fce0a0');
 
-    // 3. THE BANK (Imposing Cut-Stone Two-Story Fortress)
+    // 3. THE BANK
     const bankX = 320;
     const bankW = 152;
     const bankH = 250;
@@ -717,7 +714,6 @@ function renderHogansBackground(ctx, width, height, round = 1) {
     drawPixel(ctx, bankX, bankY, bankW, bankH, snesPalette.outline);
     drawPixel(ctx, bankX + 2, bankY + 2, bankW - 4, bankH - 4, '#7c8088');
 
-    // Stone ashlar block masonry lines
     for (let r = bankY + 6; r < groundY + 6; r += 14) {
         drawPixel(ctx, bankX + 2, r, bankW - 4, 1, '#50545c');
     }
@@ -725,7 +721,6 @@ function renderHogansBackground(ctx, width, height, round = 1) {
         drawPixel(ctx, c, bankY + 2, 1, bankH - 4, '#50545c');
     }
 
-    // Classical Stone Cornice Header
     drawPixel(ctx, bankX - 6, bankY - 22, bankW + 12, 22, snesPalette.outline);
     drawPixel(ctx, bankX - 4, bankY - 20, bankW + 8, 18, '#585c64');
 
@@ -741,7 +736,6 @@ function renderHogansBackground(ctx, width, height, round = 1) {
     ctx.font = '12px "Press Start 2P", monospace';
     ctx.fillText("BANK", bSignX + bSignW / 2, bSignY + 18);
 
-    // Upper Vault Windows
     [bankX + 14, bankX + 104].forEach((winX) => {
         drawPixel(ctx, winX - 2, bankY + 54, 34, 40, snesPalette.outline);
         drawPixel(ctx, winX, bankY + 56, 30, 36, '#181c20');
@@ -749,7 +743,6 @@ function renderHogansBackground(ctx, width, height, round = 1) {
         drawPixel(ctx, winX + 18, bankY + 56, 3, 36, '#888888');
     });
 
-    // Lower Heavy Security Windows
     [bankX + 10, bankX + 108].forEach((winX) => {
         drawPixel(ctx, winX - 2, bankY + 124, 34, 46, snesPalette.outline);
         drawPixel(ctx, winX, bankY + 126, 30, 42, '#181c20');
@@ -757,7 +750,6 @@ function renderHogansBackground(ctx, width, height, round = 1) {
         drawPixel(ctx, winX + 18, bankY + 126, 3, 42, '#888888');
     });
 
-    // Massive Vault Entrance
     const bDoorX = bankX + 52;
     const bDoorY = bankY + 118;
     drawPixel(ctx, bDoorX - 4, bDoorY - 4, 48, 128, snesPalette.outline);
@@ -766,7 +758,7 @@ function renderHogansBackground(ctx, width, height, round = 1) {
     drawPixel(ctx, bDoorX + 6, bDoorY + 10, 12, 48, '#181c20');
     drawPixel(ctx, bDoorX + 22, bDoorY + 10, 12, 48, '#181c20');
 
-    // 4. GENERAL STORE & DRY GOODS (2-Story Wood Frame)
+    // 4. GENERAL STORE & DRY GOODS
     const storeX = 476;
     const storeW = 156;
     const storeH = 220;
@@ -779,7 +771,6 @@ function renderHogansBackground(ctx, width, height, round = 1) {
         drawPixel(ctx, storeX + 2, row, storeW - 4, 1, '#5e3e24');
     }
 
-    // Decorative Store Pediment
     drawPixel(ctx, storeX + 14, storeY - 18, storeW - 28, 18, snesPalette.outline);
     drawPixel(ctx, storeX + 16, storeY - 16, storeW - 32, 14, '#5e3e24');
 
@@ -795,14 +786,12 @@ function renderHogansBackground(ctx, width, height, round = 1) {
     ctx.font = '8px "Press Start 2P", monospace';
     ctx.fillText("GENERAL STORE", gsSignX + gsSignW / 2, gsSignY + 15);
 
-    // 2nd Floor Residential / Storage Windows
     [storeX + 20, storeX + 96].forEach((winX) => {
         drawPixel(ctx, winX - 2, storeY + 46, 40, 32, snesPalette.outline);
         drawPixel(ctx, winX, storeY + 48, 36, 28, '#181014');
         drawPixel(ctx, winX + 16, storeY + 48, 4, 28, '#5e3e24');
     });
 
-    // 1st Floor Striped Canvas Awning
     const awnY = storeY + 96;
     drawPixel(ctx, storeX - 6, awnY - 2, storeW + 12, 22, snesPalette.outline);
     for (let stripe = storeX - 4; stripe < storeX + storeW + 8; stripe += 16) {
@@ -810,17 +799,15 @@ function renderHogansBackground(ctx, width, height, round = 1) {
         drawPixel(ctx, stripe + 8, awnY, 8, 18, '#fcfcfc');
     }
 
-    // Large Display Windows with Goods inside
     drawPixel(ctx, storeX + 10, storeY + 130, 44, 46, snesPalette.outline);
     drawPixel(ctx, storeX + 12, storeY + 132, 40, 42, '#181014');
     drawPixel(ctx, storeX + 102, storeY + 130, 44, 46, snesPalette.outline);
     drawPixel(ctx, storeX + 104, storeY + 132, 40, 42, '#181014');
 
-    // Store Entrance
     drawPixel(ctx, storeX + 58, storeY + 126, 40, 86, snesPalette.outline);
     drawPixel(ctx, storeX + 60, storeY + 128, 36, 84, '#482c18');
 
-    // 5. HOTEL & LODGING (Tallest 3-Tier Grand Structure)
+    // 5. HOTEL & LODGING
     const hotelX = width - 176;
     const hotelW = 172;
     const hotelH = 260;
@@ -833,7 +820,6 @@ function renderHogansBackground(ctx, width, height, round = 1) {
         drawPixel(ctx, hotelX + 2, row, hotelW - 4, 1, '#78502c');
     }
 
-    // High Grand Parapet
     drawPixel(ctx, hotelX - 6, hotelY - 24, hotelW + 12, 24, snesPalette.outline);
     drawPixel(ctx, hotelX - 4, hotelY - 22, hotelW + 8, 20, '#582410');
 
@@ -850,7 +836,6 @@ function renderHogansBackground(ctx, width, height, round = 1) {
     ctx.textAlign = 'center';
     ctx.fillText("HOTEL", hSignX + hSignW / 2, hSignY + 18);
 
-    // 2nd Floor Guest Windows
     [hotelX + 12, hotelX + 68, hotelX + 124].forEach((winX) => {
         drawPixel(ctx, winX - 2, hotelY + 50, 32, 34, snesPalette.outline);
         drawPixel(ctx, winX, hotelY + 52, 28, 30, '#181014');
@@ -858,14 +843,12 @@ function renderHogansBackground(ctx, width, height, round = 1) {
         drawPixel(ctx, winX + 20, hotelY + 54, 6, 26, '#4878a8');
     });
 
-    // Grand Veranda Balcony Railing
     drawPixel(ctx, hotelX - 6, hotelY + 98, hotelW + 12, 8, snesPalette.outline);
     drawPixel(ctx, hotelX - 4, hotelY + 100, hotelW + 8, 4, '#d89c58');
     for (let post = hotelX; post < hotelX + hotelW; post += 12) {
         drawPixel(ctx, post, hotelY + 90, 2, 10, '#381808');
     }
 
-    // 1st Floor Parlour Windows
     [hotelX + 12, hotelX + 124].forEach((winX) => {
         drawPixel(ctx, winX - 2, hotelY + 120, 34, 46, snesPalette.outline);
         drawPixel(ctx, winX, hotelY + 122, 30, 42, '#181014');
@@ -873,12 +856,11 @@ function renderHogansBackground(ctx, width, height, round = 1) {
         drawPixel(ctx, winX + 22, hotelY + 124, 6, 38, '#4878a8');
     });
 
-    // Grand Double Doorway Lobby
     drawPixel(ctx, hotelX + 60, hotelY + 116, 48, 134, snesPalette.outline);
     drawPixel(ctx, hotelX + 62, hotelY + 118, 44, 132, '#482010');
     drawPixel(ctx, hotelX + 83, hotelY + 118, 2, 132, '#201008');
 
-    // 6. HITCHING POST & HORSE (Proportional Ground Assets)
+    // 6. HITCHING POST & HORSE
     drawPixel(ctx, 238, groundY - 18, 94, 28, snesPalette.outline);
     drawPixel(ctx, 240, groundY - 16, 90, 6, '#88481c');
     drawPixel(ctx, 244, groundY - 10, 6, 26, '#582c0e');
@@ -993,6 +975,9 @@ export function createRenderer(canvas) {
             }
 
             renderHogansBackground(context, width, height, state.round);
+
+            // Wind Dust FX
+            drawDustParticles(context, state.dustParticles, state.round);
 
             // Tumbleweed
             if (state.tumbleweed && state.tumbleweed.active) {
